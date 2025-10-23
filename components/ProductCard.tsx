@@ -1,0 +1,155 @@
+'use client'
+
+import Image from 'next/image'
+import Link from 'next/link'
+import { ShoppingCart, Star, Heart } from 'lucide-react'
+import { useCart } from '@/context/CartContext'
+import { formatPrice } from '@/lib/utils'
+import { motion } from 'framer-motion'
+
+interface ProductCardProps {
+  product: {
+    id: string
+    name: string
+    slug: string
+    flavour: string
+    description: string
+    price: number
+    originalPrice?: number
+    image_url: string
+    stock: number
+  }
+}
+
+export default function ProductCard({ product }: ProductCardProps) {
+  const { addItem } = useCart()
+
+  const handleAddToCart = () => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image_url,
+      flavour: product.flavour,
+    })
+  }
+
+  // Calculate discount percentage if original price exists
+  const discountPercentage = product.originalPrice 
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+    : 0
+
+  return (
+    <motion.div 
+      whileHover={{ y: -8, scale: 1.02 }}
+      className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 p-6 group relative overflow-hidden flex flex-col h-full"
+    >
+      {/* Discount Badge */}
+      {discountPercentage > 0 && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="absolute top-4 left-4 z-10 bg-gradient-to-br from-red-500 to-pink-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg"
+        >
+          {discountPercentage}% OFF
+        </motion.div>
+      )}
+
+      {/* Wishlist Button */}
+      <motion.button
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        className="absolute top-4 right-4 z-10 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-md hover:bg-white transition-colors"
+      >
+        <Heart className="w-5 h-5 text-gray-400 hover:text-red-500 transition-colors" />
+      </motion.button>
+
+      <Link href={`/products/${product.slug}`}>
+        <div className="relative mb-4">
+          <motion.div 
+            whileHover={{ scale: 1.05 }}
+            className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl overflow-hidden"
+          >
+            <Image
+              src={product.image_url}
+              alt={product.name}
+              width={300}
+              height={300}
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            />
+          </motion.div>
+          {product.stock === 0 && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm rounded-xl flex items-center justify-center"
+            >
+              <span className="text-white font-semibold text-lg">Out of Stock</span>
+            </motion.div>
+          )}
+        </div>
+      </Link>
+
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 font-poppins group-hover:text-primary-orange transition-colors">
+            {product.name}
+          </h3>
+          <p className="text-sm text-primary-red font-medium">{product.flavour}</p>
+        </div>
+
+        <p className="text-gray-600 text-sm line-clamp-2">
+          {product.description}
+        </p>
+
+        {/* Rating with Review Count */}
+        <div className="flex items-center space-x-1">
+          {[...Array(5)].map((_, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.1 }}
+            >
+              <Star className="w-4 h-4 text-yellow-400 fill-current" />
+            </motion.div>
+          ))}
+          <span className="text-sm text-gray-500 ml-1">4.8</span>
+          <span className="text-sm text-gray-400">• 234 reviews</span>
+        </div>
+
+        {/* Spacer to push content to bottom */}
+        <div className="flex-grow"></div>
+
+        {/* Pricing */}
+        <div className="flex items-center gap-2">
+          <span className="text-2xl font-bold text-primary-orange">
+            {formatPrice(product.price)}
+          </span>
+          {product.originalPrice && (
+            <span className="text-lg text-gray-400 line-through">
+              {formatPrice(product.originalPrice)}
+            </span>
+          )}
+        </div>
+
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={handleAddToCart}
+          disabled={product.stock === 0}
+          className="w-full btn-primary flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
+        >
+          <motion.div
+            className="absolute inset-0 bg-white/20"
+            initial={{ x: '-100%' }}
+            whileHover={{ x: '100%' }}
+            transition={{ duration: 0.6 }}
+          />
+          <ShoppingCart className="w-4 h-4 relative z-10" />
+          <span className="relative z-10">{product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}</span>
+        </motion.button>
+      </div>
+    </motion.div>
+  )
+}

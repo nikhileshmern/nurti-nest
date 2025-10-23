@@ -1,0 +1,250 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', sans-serif;
+    background: #FFF7ED; /* Background - Soft Orange Cream */
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
+    color: #7C2D12; /* Text - Dark Orange Brown */
+    overflow-x: hidden;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    color: #FB923C; /* Primary - Vibrant Orange */
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  /* Premium scrollbar using brand colors */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #FFF7ED; /* Background - Soft Orange Cream */
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #F97316, #EC4899); /* Orange to Pomegranate */
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #EC4899, #F97316); /* Pomegranate to Orange */
+  }
+}
+
+@layer components {
+  /* Premium Button Styles using brand colors */
+  .btn-primary {
+    @apply bg-gradient-to-r from-accent-1 to-accent-2 hover:from-accent-2 hover:to-accent-1 text-white font-bold py-4 px-8 rounded-xl transition-all duration-500 transform hover:scale-105 hover:shadow-2xl;
+    background: linear-gradient(135deg, #F97316 0%, #EC4899 100%); /* Orange to Pomegranate */
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease infinite;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+  
+  .btn-primary:hover::before {
+    left: 100%;
+  }
+  
+  .btn-secondary {
+    @apply bg-gradient-to-r from-highlight to-primary hover:from-primary hover:to-highlight text-white font-bold py-4 px-8 rounded-xl transition-all duration-500 transform hover:scale-105 hover:shadow-2xl;
+    background: linear-gradient(135deg, #EF4444 0%, #FB923C 100%); /* Red to Orange */
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease infinite;
+  }
+  
+  .btn-logo {
+    @apply bg-gradient-to-r from-primary to-accent-1 hover:from-accent-1 hover:to-primary text-white font-bold py-4 px-8 rounded-xl transition-all duration-500 transform hover:scale-105 hover:shadow-2xl;
+    background: linear-gradient(135deg, #FB923C 0%, #F97316 100%); /* Vibrant Orange to Deep Orange */
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease infinite;
+  }
+  
+  /* Premium Card Styles using brand colors */
+  .card {
+    @apply bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 border border-neutral/20;
+    background: linear-gradient(145deg, rgba(255,255,255,0.9), rgba(255,247,237,0.8)); /* White to Soft Orange Cream */
+  }
+  
+  .card-premium {
+    @apply bg-gradient-to-br from-white via-background to-background rounded-2xl shadow-2xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 border-2 border-accent-1/20;
+    background: linear-gradient(145deg, #FFFFFF 0%, #FFF7ED 50%, #FFEDD5 100%); /* White to Soft Orange Cream */
+    background-size: 200% 200%;
+    animation: gradientShift 4s ease infinite;
+  }
+  
+  .card-floating {
+    @apply card animate-float;
+  }
+  
+  /* Premium Container */
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Premium Text Styles using brand colors */
+  .text-gradient-logo {
+    background: linear-gradient(135deg, #FB923C, #F97316, #EC4899); /* Orange to Deep Orange to Pomegranate */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .text-gradient-natural {
+    background: linear-gradient(135deg, #EF4444, #FB923C, #F97316); /* Red to Orange to Deep Orange */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .text-gradient-warm {
+    background: linear-gradient(135deg, #FB923C, #F97316, #EC4899); /* Orange to Deep Orange to Pomegranate */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .text-gradient-primary {
+    background: linear-gradient(135deg, #F97316, #FB923C, #EC4899); /* Deep Orange to Orange to Pomegranate */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .text-gradient-accent {
+    background: linear-gradient(135deg, #F97316, #EC4899, #EF4444); /* Deep Orange to Pomegranate to Red */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Premium Animations */
+  .animate-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease-out;
+  }
+  
+  .animate-on-scroll.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Premium Glow Effects using brand colors */
+  .glow-orange {
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); /* Deep Orange glow */
+  }
+  
+  .glow-red {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); /* Red glow */
+  }
+  
+  .glow-pomegranate {
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.4); /* Pomegranate Pink glow */
+  }
+  
+  .glow-primary {
+    box-shadow: 0 0 20px rgba(251, 146, 60, 0.4); /* Vibrant Orange glow */
+  }
+  
+  /* Premium Hover Effects */
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl;
+  }
+  
+  .hover-glow {
+    @apply transition-all duration-300 hover:shadow-xl hover:shadow-accent-1/20;
+  }
+  
+  /* Premium Backgrounds using brand colors */
+  .bg-premium-gradient {
+    background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 50%, #FB923C 100%); /* Soft Orange Cream to Vibrant Orange */
+    background-size: 200% 200%;
+    animation: gradientShift 6s ease infinite;
+  }
+  
+  .bg-luxury-pattern {
+    background-image: 
+      radial-gradient(circle at 25% 25%, rgba(249, 115, 22, 0.15) 0%, transparent 50%), /* Deep Orange */
+      radial-gradient(circle at 75% 75%, rgba(236, 72, 153, 0.15) 0%, transparent 50%); /* Pomegranate Pink */
+  }
+  
+  /* Modern Animations */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); }
+    50% { box-shadow: 0 0 30px rgba(249, 115, 22, 0.7); }
+  }
+  
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+  
+  .animate-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .animate-shimmer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: shimmer 2s infinite;
+  }
+  
+  /* Modern Glass Effect */
+  .glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  /* Premium Hover Effects */
+  .hover-lift-3d {
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
+  }
+  
+  .hover-lift-3d:hover {
+    transform: translateY(-8px) rotateX(5deg);
+  }
+}
