@@ -1,5 +1,3 @@
-import { loadScript } from '@razorpay/razorpay-js'
-
 export interface RazorpayOptions {
   key: string
   amount: number

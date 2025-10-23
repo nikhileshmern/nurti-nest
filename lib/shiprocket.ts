@@ -49,7 +49,7 @@ let authToken: string | null = null
 
 export async function getShiprocketToken(): Promise<string> {
   if (authToken) {
-    return authToken
+    return authToken as string
   }
 
   try {
@@ -59,6 +59,9 @@ export async function getShiprocketToken(): Promise<string> {
     })
 
     authToken = response.data.token
+    if (!authToken) {
+      throw new Error('No token received from Shiprocket')
+    }
     return authToken
   } catch (error) {
     console.error('Shiprocket authentication failed:', error)
