@@ -230,61 +230,6 @@ export default function ContactPage() {
             </motion.div>
           </motion.div>
         </div>
-
-        {/* FAQ Section */}
-        <motion.section 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="mt-20"
-        >
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="text-3xl font-bold text-accent-1 font-poppins mb-12 text-center"
-          >
-            Frequently Asked Questions
-          </motion.h2>
-          
-          <div className="w-full">
-            <div className="space-y-4">
-              {[
-                {
-                  question: 'How long does shipping take?',
-                  answer: 'We typically ship orders within 1-2 business days. Delivery takes 3-5 business days within India. You\'ll receive tracking information once your order ships.'
-                },
-                {
-                  question: 'Are your products safe for children?',
-                  answer: 'Yes, all our products are specifically formulated for children aged 4+ and are manufactured in certified facilities following strict safety standards.'
-                },
-                {
-                  question: 'What if my child doesn\'t like the taste?',
-                  answer: 'We offer a 30-day satisfaction guarantee. If your child doesn\'t like the taste, you can return the product for a full refund.'
-                }
-              ].map((faq, index) => (
-                <motion.div 
-                  key={faq.question}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  whileHover={{ y: -4, scale: 1.01 }}
-                  className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6"
-                >
-                  <h3 className="text-lg font-semibold text-text font-poppins mb-3">
-                    {faq.question}
-                  </h3>
-                  <p className="text-text">
-                    {faq.answer}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </motion.section>
       </div>
     </main>
   )

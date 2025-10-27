@@ -134,8 +134,9 @@ export default function Footer() {
               {[
                 { href: '/contact', label: 'Contact Us' },
                 { href: '/faq', label: 'FAQ' },
-                { href: '/shipping', label: 'Shipping Info' },
-                { href: '/returns', label: 'Returns' }
+                { href: '/shipping', label: 'Shipping & Delivery Policy' },
+                { href: '/cancellation', label: 'Cancellation & Refund Policy' },
+                { href: '/terms', label: 'Terms & Conditions' }
               ].map((link, index) => (
                 <motion.li
                   key={index}
@@ -208,9 +209,9 @@ export default function Footer() {
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-text">
             {[
-              { icon: Mail, text: 'support@nutri-nest.com' },
+              { icon: Mail, text: 'support@nutrinest.in' },
               { icon: Phone, text: '+91 98765 43210' },
-              { icon: MapPin, text: 'Mumbai, India' }
+              { icon: MapPin, text: 'hyderabad, India' }
             ].map((contact, index) => (
               <motion.div
                 key={index}
@@ -240,7 +241,7 @@ export default function Footer() {
           viewport={{ once: true }}
           className="border-t border-accent-1/30 mt-8 pt-8 text-center text-text/70 text-sm"
         >
-          <p>&copy; 2024 L&C Biotech. All rights reserved. | Nutri Nest - Healthy Eyes Start with a YumBurst!</p>
+          <p>&copy; 2025 L&C Biotech. All rights reserved. | Nutri Nest - Healthy Eyes Start with a YumBurst!</p>
         </motion.div>
       </div>
     </footer>
