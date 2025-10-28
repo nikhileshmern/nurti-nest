@@ -3,11 +3,11 @@
 import { useState } from 'react'
 import { useCart } from '@/context/CartContext'
 import { formatPrice } from '@/lib/utils'
-import { TestTube, CreditCard, Truck, Package, CheckCircle } from 'lucide-react'
+import { TestTube, CreditCard, Truck, Package, CheckCircle, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function TestFlowPage() {
-  const { items, getTotalPrice, addToCart } = useCart()
+  const { items, getTotalPrice, addItem } = useCart()
   const [testResults, setTestResults] = useState<any[]>([])
   const [isRunningTest, setIsRunningTest] = useState(false)
 
@@ -33,7 +33,7 @@ export default function TestFlowPage() {
 
   const addSampleItems = () => {
     sampleItems.forEach(item => {
-      addToCart(item)
+      addItem(item)
     })
     toast.success('Sample items added to cart!')
   }
@@ -154,7 +154,7 @@ export default function TestFlowPage() {
       
     } catch (error) {
       console.error('Test failed:', error)
-      toast.error('Test failed: ' + error.message)
+      toast.error('Test failed: ' + (error instanceof Error ? error.message : 'Unknown error occurred'))
     } finally {
       setIsRunningTest(false)
     }

@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     console.error('Order creation failed:', error)
     return NextResponse.json({ 
       error: 'Failed to create order',
-      details: error.message 
+      details: error instanceof Error ? error.message : 'Unknown error occurred'
     }, { status: 500 })
   }
 }

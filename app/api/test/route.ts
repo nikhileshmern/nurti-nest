@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return NextResponse.json({ 
       error: 'Invalid JSON', 
-      message: error.message 
+      message: error instanceof Error ? error.message : 'Unknown error occurred'
     }, { status: 400 })
   }
 }

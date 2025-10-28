@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { supabase } from '@/lib/supabase'
+import { AuthChangeEvent, Session } from '@supabase/supabase-js'
 import toast from 'react-hot-toast'
 
 interface User {
@@ -44,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: AuthChangeEvent, session: Session | null) => {
         if (session?.user) {
           await fetchUserProfile(session.user.id)
         } else {

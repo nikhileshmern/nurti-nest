@@ -80,7 +80,7 @@ export default function Header() {
           </nav>
 
           {/* Cart & User Menu - Right */}
-          <div className="flex items-cente">
+          <div className="flex items-center space-x-4">
             {/* Cart */}
             <button 
               onClick={() => setIsCartOpen(true)}

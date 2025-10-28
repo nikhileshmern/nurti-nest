@@ -179,7 +179,7 @@ export default function Hero() {
                 initial={{ opacity: 0, x: -50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8 }}
-                className="space-y-8 pl-14"
+                className="space-y-8 "
               >
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
