@@ -136,7 +136,8 @@ export default function Footer() {
                 { href: '/faq', label: 'FAQ' },
                 { href: '/shipping', label: 'Shipping & Delivery Policy' },
                 { href: '/cancellation', label: 'Cancellation & Refund Policy' },
-                { href: '/terms', label: 'Terms & Conditions' }
+                { href: '/terms', label: 'Terms & Conditions' },
+                { href: '/privacy', label: 'Privacy Policy' }
               ].map((link, index) => (
                 <motion.li
                   key={index}
