@@ -11,9 +11,9 @@ public/images/
 │   ├── logo-icon.png       # Logo icon only
 │   └── favicon.ico         # Website favicon
 ├── products/               # Product images
-│   ├── orange-gummies.jpg  # Orange gummies product image
-│   ├── pomegranate-gummies.jpg # Pomegranate gummies product image
-│   └── combo-pack.jpg      # Combo pack product image
+│   ├── orange-gummy.png  # Orange gummies product image
+│   ├── pomogranate-gummy.png # Pomegranate gummies product image
+│   └── combo-pack.png      # Combo pack product image
 ├── hero/                   # Hero section images
 │   ├── hero-bg.jpg         # Hero background image
 │   └── hero-kids.jpg       # Kids with gummies image
@@ -70,7 +70,7 @@ Images are referenced in the code using the `/images/` path:
 ```jsx
 // Example usage
 <img src="/images/logo/logo.png" alt="Nutri Nest Logo" />
-<img src="/images/products/orange-gummies.jpg" alt="Orange Gummies" />
+<img src="/images/products/orange-gummy.png" alt="Orange Gummies" />
 ```
 
 ## Optimization

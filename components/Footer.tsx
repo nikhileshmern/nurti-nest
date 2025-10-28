@@ -71,9 +71,9 @@ export default function Footer() {
             </p>
             <div className="flex space-x-4">
               {[
-                { icon: Facebook, href: '#' },
-                { icon: Instagram, href: '#' },
-                { icon: Twitter, href: '#' }
+                // { icon: Facebook, href: '#' },
+                { icon: Instagram, href: 'https://www.instagram.com/mynutrinest.in?igsh=ZmxneWNncGMwdHR0' },
+                // { icon: Twitter, href: '#' }
               ].map((social, index) => (
                 <motion.a
                   key={index}

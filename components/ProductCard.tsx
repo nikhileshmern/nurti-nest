@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { ShoppingCart, Star, Heart } from 'lucide-react'
+import { ShoppingCart, Star, Heart, CreditCard } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 import { formatPrice } from '@/lib/utils'
 import { motion } from 'framer-motion'
@@ -133,22 +133,40 @@ export default function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
 
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={handleAddToCart}
-          disabled={product.stock === 0}
-          className="w-full btn-primary flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
-        >
-          <motion.div
-            className="absolute inset-0 bg-white/20"
-            initial={{ x: '-100%' }}
-            whileHover={{ x: '100%' }}
-            transition={{ duration: 0.6 }}
-          />
-          <ShoppingCart className="w-4 h-4 relative z-10" />
-          <span className="relative z-10">{product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}</span>
-        </motion.button>
+        <div className="flex gap-2">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleAddToCart}
+            disabled={product.stock === 0}
+            className="flex-1 btn-primary flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
+          >
+            <motion.div
+              className="absolute inset-0 bg-white/20"
+              initial={{ x: '-100%' }}
+              whileHover={{ x: '100%' }}
+              transition={{ duration: 0.6 }}
+            />
+            <ShoppingCart className="w-4 h-4 relative z-10" />
+            <span className="relative z-10">{product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}</span>
+          </motion.button>
+          
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => {
+              if (product.stock > 0) {
+                handleAddToCart()
+                window.location.href = '/checkout'
+              }
+            }}
+            disabled={product.stock === 0}
+            className="flex-1 bg-gradient-to-r from-accent-1 to-accent-2 hover:from-accent-1/90 hover:to-accent-2/90 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <CreditCard className="w-4 h-4" />
+            <span>{product.stock === 0 ? 'Out of Stock' : 'Buy Now'}</span>
+          </motion.button>
+        </div>
       </div>
     </motion.div>
   )

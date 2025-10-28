@@ -26,7 +26,7 @@ function RecommendedProducts({ items, onClose, addItem }: { items: any[], onClos
       slug: 'yumburst-orange-gummies',
       flavour: 'Orange',
       price: 699,
-      image_url: '/images/products/orange-gummies.jpg',
+      image_url: '/images/products/orange-gummy.png',
       emoji: '🍊'
     },
     {
@@ -35,7 +35,7 @@ function RecommendedProducts({ items, onClose, addItem }: { items: any[], onClos
       slug: 'yumburst-pomegranate-gummies',
       flavour: 'Pomegranate',
       price: 699,
-      image_url: '/images/products/pomegranate-gummies.jpg',
+      image_url: '/images/products/pomogranate-gummy.png',
       emoji: '🍇'
     },
     {
@@ -44,7 +44,7 @@ function RecommendedProducts({ items, onClose, addItem }: { items: any[], onClos
       slug: 'yumburst-combo-pack',
       flavour: 'Mixed',
       price: 1299,
-      image_url: '/images/products/combo-pack.jpg',
+      image_url: '/images/products/combo-pack.png',
       emoji: '🎁'
     }
   ]

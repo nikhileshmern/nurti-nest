@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { isTestMode, getTestModeConfig, generateMockShipmentResponse, generateMockTrackingResponse } from './test-utils'
 
 const SHIPROCKET_BASE_URL = process.env.SHIPROCKET_BASE_URL || 'https://apiv2.shiprocket.in'
 
@@ -52,6 +53,12 @@ export async function getShiprocketToken(): Promise<string> {
     return authToken as string
   }
 
+  if (isTestMode()) {
+    console.log('🧪 Test Mode: Using mock Shiprocket token')
+    authToken = 'test_token_' + Date.now()
+    return authToken
+  }
+
   try {
     const response = await axios.post(`${SHIPROCKET_BASE_URL}/auth/login`, {
       email: process.env.SHIPROCKET_EMAIL,
@@ -70,6 +77,17 @@ export async function getShiprocketToken(): Promise<string> {
 }
 
 export async function createShipment(data: CreateShipmentData): Promise<any> {
+  if (isTestMode()) {
+    console.log('🧪 Test Mode: Creating mock shipment...', data)
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    const mockResponse = generateMockShipmentResponse(data.order_id)
+    console.log('🧪 Test Mode: Shipment created', mockResponse)
+    return mockResponse
+  }
+
   try {
     const token = await getShiprocketToken()
     
@@ -88,6 +106,17 @@ export async function createShipment(data: CreateShipmentData): Promise<any> {
 }
 
 export async function getTrackingInfo(awb: string): Promise<any> {
+  if (isTestMode()) {
+    console.log('🧪 Test Mode: Getting mock tracking info for AWB:', awb)
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
+    const mockResponse = generateMockTrackingResponse(awb)
+    console.log('🧪 Test Mode: Tracking info retrieved', mockResponse)
+    return mockResponse
+  }
+
   try {
     const token = await getShiprocketToken()
     

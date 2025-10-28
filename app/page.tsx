@@ -5,9 +5,10 @@ import Hero from '@/components/Hero'
 import ProductCard from '@/components/ProductCard'
 import TestimonialCard from '@/components/TestimonialCard'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Eye, Monitor, Leaf, Award, Star, ChevronLeft, ChevronRight, Package, Gift } from 'lucide-react'
+import { Eye, Monitor, Leaf, Award, Star, Package, ShoppingCart, CreditCard } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { formatPrice } from '@/lib/utils'
+import { useCart } from '@/context/CartContext'
 
 // All products data - individual and combo products
 const individualProducts = [
@@ -19,7 +20,7 @@ const individualProducts = [
     description: 'Delicious orange-flavored eye-care gummies packed with essential nutrients for healthy vision.',
     price: 699,
     originalPrice: 899,
-    image_url: '/images/products/orange-gummies.jpg',
+    image_url: '/images/products/orange-gummy.png',
     stock: 50,
     category: 'individual'
   },
@@ -31,7 +32,7 @@ const individualProducts = [
     description: 'Tasty pomegranate-flavored gummies rich in antioxidants for optimal eye health.',
     price: 699,
     originalPrice: 899,
-    image_url: '/images/products/pomegranate-gummies.jpg',
+    image_url: '/images/products/pomogranate-gummy.png',
     stock: 30,
     category: 'individual'
   },
@@ -47,7 +48,7 @@ const comboProducts = [
     price: 1299,
     originalPrice: 1398,
     discountPercentage: 7,
-    image_url: '/images/products/combo-pack.jpg',
+    image_url: '/images/products/combo-pack.png',
     stock: 25,
     category: 'combo',
     includedProducts: [
@@ -92,28 +93,6 @@ const sampleTestimonials = [
 
 
 export default function HomePage() {
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const itemsPerSlide = 3
-  const totalSlides = Math.ceil(allProducts.length / itemsPerSlide)
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % totalSlides)
-  }
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides)
-  }
-
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index)
-  }
-
-  const getCurrentProducts = () => {
-    const start = currentSlide * itemsPerSlide
-    const end = start + itemsPerSlide
-    return allProducts.slice(start, end)
-  }
-
   return (
     <main className="min-h-screen">
       <Hero />
@@ -136,36 +115,15 @@ export default function HomePage() {
             </p>
           </motion.div>
           
-          {/* Carousel Container */}
+          {/* Products Grid */}
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             viewport={{ once: true }}
-            className="relative"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
-            {/* Navigation Buttons */}
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={prevSlide}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full shadow-lg flex items-center justify-center text-white hover:from-orange-500 hover:to-orange-700 transition-all"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </motion.button>
-            
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={nextSlide}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-12 h-12 bg-gradient-to-br from-red-400 to-pink-600 rounded-full shadow-lg flex items-center justify-center text-white hover:from-red-500 hover:to-pink-700 transition-all"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </motion.button>
-
-            {/* Products Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-8">
-              {getCurrentProducts().map((product, index) => (
+            {allProducts.map((product, index) => (
                 <motion.div
                   key={product.id}
                   initial={{ opacity: 0, y: 30 }}
@@ -180,36 +138,6 @@ export default function HomePage() {
                   )}
                 </motion.div>
               ))}
-            </div>
-
-            {/* Dots Indicator */}
-            <div className="flex justify-center mt-8 space-x-3">
-              {Array.from({ length: totalSlides }).map((_, index) => (
-                <motion.button
-                  key={index}
-                  whileHover={{ scale: 1.2 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => goToSlide(index)}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    index === currentSlide
-                      ? 'bg-gradient-to-r from-orange-500 to-red-500 scale-125 shadow-lg'
-                      : 'bg-gray-300 hover:bg-gradient-to-r hover:from-orange-300 hover:to-red-300'
-                  }`}
-                />
-              ))}
-            </div>
-          </motion.div>
-          
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            viewport={{ once: true }}
-            className="text-center mt-12"
-          >
-            <a href="/products" className="btn-primary">
-              View All Products
-            </a>
           </motion.div>
         </div>
       </section>
@@ -351,6 +279,17 @@ export default function HomePage() {
 // Combo Card Component
 function ComboCard({ combo }: { combo: any }) {
   const [isExpanded, setIsExpanded] = useState(false)
+  const { addItem } = useCart()
+
+  const handleAddToCart = () => {
+    addItem({
+      id: combo.id,
+      name: combo.name,
+      price: combo.price,
+      image: combo.image_url,
+      flavour: combo.flavour,
+    })
+  }
 
   return (
     <motion.div
@@ -457,20 +396,36 @@ function ComboCard({ combo }: { combo: any }) {
           </div>
         </div>
 
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="w-full btn-primary flex items-center justify-center space-x-2 relative overflow-hidden"
-        >
-          <motion.div
-            className="absolute inset-0 bg-white/20"
-            initial={{ x: '-100%' }}
-            whileHover={{ x: '100%' }}
-            transition={{ duration: 0.6 }}
-          />
-          <Gift className="w-4 h-4 relative z-10" />
-          <span className="relative z-10">Add Combo to Cart</span>
-        </motion.button>
+        <div className="flex gap-2">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleAddToCart}
+            className="flex-1 btn-primary flex items-center justify-center space-x-2 relative overflow-hidden"
+          >
+            <motion.div
+              className="absolute inset-0 bg-white/20"
+              initial={{ x: '-100%' }}
+              whileHover={{ x: '100%' }}
+              transition={{ duration: 0.6 }}
+            />
+            <ShoppingCart className="w-4 h-4 relative z-10" />
+            <span className="relative z-10">Add to Cart</span>
+          </motion.button>
+          
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => {
+              handleAddToCart()
+              window.location.href = '/checkout'
+            }}
+            className="flex-1 bg-gradient-to-r from-accent-1 to-accent-2 hover:from-accent-1/90 hover:to-accent-2/90 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+          >
+            <CreditCard className="w-4 h-4" />
+            <span>Buy Now</span>
+          </motion.button>
+        </div>
       </div>
     </motion.div>
   )

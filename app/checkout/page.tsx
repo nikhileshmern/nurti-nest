@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useCart } from '@/context/CartContext'
 import { formatPrice } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, CreditCard, Truck, Shield, X } from 'lucide-react'
+import { ArrowLeft, CreditCard, Truck, Shield, X, TestTube } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -13,6 +13,7 @@ export default function CheckoutPage() {
   const { items, getTotalPrice, clearCart } = useCart()
   const router = useRouter()
   const [isProcessing, setIsProcessing] = useState(false)
+  const [isTestMode, setIsTestMode] = useState(false)
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
     email: '',
@@ -28,6 +29,11 @@ export default function CheckoutPage() {
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number; type: 'percentage' | 'fixed'; description: string } | null>(null)
   const [couponError, setCouponError] = useState('')
   const [showCoupons, setShowCoupons] = useState(false)
+
+  // Check if we're in test mode
+  useEffect(() => {
+    setIsTestMode(process.env.NEXT_PUBLIC_TEST_MODE === 'true')
+  }, [])
 
   // Available coupons
   const availableCoupons = {
@@ -108,46 +114,60 @@ export default function CheckoutPage() {
 
       const { orderId, amount, currency } = await response.json()
 
-      // Load Razorpay script
-      const script = document.createElement('script')
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js'
-      script.onload = () => {
-        const options = {
-          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-          amount: amount,
-          currency: currency,
-          name: 'Nutri Nest',
-          description: 'YumBurst Gummies Order',
-          order_id: orderId,
-          prefill: {
-            name: customerInfo.name,
-            email: customerInfo.email,
-            contact: customerInfo.phone,
-          },
-          notes: {
-            address: customerInfo.address,
-          },
-          theme: {
-            color: '#FFA726',
-          },
-          handler: async (response: any) => {
-            // Payment successful
-            toast.success('Payment successful!')
-            clearCart()
-            router.push(`/order-success?order_id=${orderId}`)
-          },
-          modal: {
-            ondismiss: () => {
-              toast.error('Payment cancelled')
+      if (isTestMode) {
+        // Test mode: Simulate payment automatically
+        console.log('🧪 Test Mode: Simulating payment...')
+        toast.success('🧪 Processing test payment...')
+        
+        // Simulate payment success after 2 seconds
+        setTimeout(() => {
+          console.log('🧪 Test Mode: Payment successful!')
+          toast.success('🧪 Test Payment successful!')
+          clearCart()
+          router.push(`/order-success?order_id=${orderId}`)
+        }, 2000)
+      } else {
+        // Production mode: Use real Razorpay
+        const script = document.createElement('script')
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+        script.onload = () => {
+          const options = {
+            key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+            amount: amount,
+            currency: currency,
+            name: 'Nutri Nest',
+            description: 'YumBurst Gummies Order',
+            order_id: orderId,
+            prefill: {
+              name: customerInfo.name,
+              email: customerInfo.email,
+              contact: customerInfo.phone,
             },
-          },
+            notes: {
+              address: customerInfo.address,
+            },
+            theme: {
+              color: '#FFA726',
+            },
+            handler: async (response: any) => {
+              // Payment successful
+              toast.success('Payment successful!')
+              clearCart()
+              router.push(`/order-success?order_id=${orderId}`)
+            },
+            modal: {
+              ondismiss: () => {
+                toast.error('Payment cancelled')
+              },
+            },
+          }
+
+          const rzp = new (window as any).Razorpay(options)
+          rzp.open()
         }
 
-        const rzp = new (window as any).Razorpay(options)
-        rzp.open()
+        document.body.appendChild(script)
       }
-
-      document.body.appendChild(script)
     } catch (error) {
       console.error('Checkout error:', error)
       toast.error('Failed to process payment. Please try again.')
@@ -169,9 +189,17 @@ export default function CheckoutPage() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Cart
           </Link>
-          <h1 className="text-4xl font-bold text-gray-900 font-poppins">
-            Checkout
-          </h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-4xl font-bold text-gray-900 font-poppins">
+              Checkout
+            </h1>
+            {isTestMode && (
+              <div className="flex items-center space-x-2 bg-yellow-100 text-yellow-800 px-3 py-2 rounded-lg">
+                <TestTube className="w-4 h-4" />
+                <span className="text-sm font-semibold">Test Mode</span>
+              </div>
+            )}
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -472,8 +500,22 @@ export default function CheckoutPage() {
               disabled={isProcessing}
               className="w-full btn-primary text-lg py-4 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isProcessing ? 'Processing...' : `Pay ${formatPrice(total)}`}
+              {isProcessing ? 'Processing...' : (
+                isTestMode ? `🧪 Test Pay ${formatPrice(total)}` : `Pay ${formatPrice(total)}`
+              )}
             </button>
+            
+            {isTestMode && (
+              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <h4 className="font-semibold text-blue-900 mb-2">🧪 Test Mode Instructions</h4>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  <li>• Payment will be simulated automatically</li>
+                  <li>• No real money will be charged</li>
+                  <li>• Shipment will be created with mock data</li>
+                  <li>• Check console for detailed logs</li>
+                </ul>
+              </div>
+            )}
           </div>
         </form>
       </div>

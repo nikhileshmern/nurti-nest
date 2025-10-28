@@ -172,7 +172,7 @@ export default function Hero() {
       <div className="w-full px-4 sm:px-6 lg:px-8 relative">
         <div className="w-full">
           <div className="w-full">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
+            <div className="flex flex-col-reverse lg:grid lg:grid-cols-2 gap-12 items-center w-full">
               <div className="w-full">
               {/* Left Content */}
               <motion.div 
@@ -240,7 +240,7 @@ export default function Hero() {
               transition={{ duration: 0.8, delay: 0.6 }}
               className="flex flex-col sm:flex-row gap-4"
             >
-              <Link href="/products" className="bg-white text-accent-1 hover:bg-gray-100 font-semibold py-4 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl inline-flex items-center justify-center text-lg">
+              <Link href="/products" className="bg-orange-500 text-white hover:bg-orange-600 font-semibold py-4 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl inline-flex items-center justify-center text-lg">
                 Shop Now
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>

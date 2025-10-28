@@ -5,7 +5,7 @@ import ProductCard from '@/components/ProductCard'
 import { motion, AnimatePresence } from 'framer-motion'
 import { formatPrice } from '@/lib/utils'
 import { useCart } from '@/context/CartContext'
-import { Eye, Monitor, Leaf, Award, Star, Gift, Truck, Package, Heart } from 'lucide-react'
+import { Eye, Monitor, Leaf, Award, Star, ShoppingCart, Truck, Package, Heart, CreditCard } from 'lucide-react'
 
 // Sample products data
 const individualProducts = [
@@ -17,7 +17,7 @@ const individualProducts = [
     description: 'Delicious orange-flavored eye-care gummies packed with essential nutrients for healthy vision. Made with natural ingredients and fortified with vitamins A, C, and E.',
     price: 699,
     originalPrice: 899,
-    image_url: '/images/products/orange-gummies.jpg',
+    image_url: '/images/products/orange-gummy.png',
     stock: 50,
     category: 'individual'
   },
@@ -29,7 +29,7 @@ const individualProducts = [
     description: 'Tasty pomegranate-flavored gummies rich in antioxidants for optimal eye health. Contains lutein and zeaxanthin for blue light protection.',
     price: 699,
     originalPrice: 899,
-    image_url: '/images/products/pomegranate-gummies.jpg',
+    image_url: '/images/products/pomogranate-gummy.png',
     stock: 30,
     category: 'individual'
   },
@@ -46,7 +46,7 @@ const comboProducts = [
     price: 1299,
     originalPrice: 1398,
     discountPercentage: 7,
-    image_url: '/images/products/combo-pack.jpg',
+    image_url: '/images/products/combo-pack.png',
     stock: 25,
     category: 'combo',
     includedProducts: [
@@ -142,7 +142,7 @@ export default function ProductsPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5 }}
-            className="flex flex-wrap justify-center gap-8 mb-16"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16 flex justify-center mx-auto"
           >
             {filteredProducts.map((product, index) => (
               <motion.div
@@ -150,7 +150,7 @@ export default function ProductsPage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.33rem)] max-w-sm"
+                className="w-full"
               >
                 {product.category === 'combo' ? (
                   <ComboCard combo={product} />
@@ -253,41 +253,7 @@ export default function ProductsPage() {
           </div>
         </motion.div>
 
-        {/* Special Offer */}
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center"
-        >
-          <div className="bg-gradient-to-r from-accent-1 to-accent-2 text-white rounded-2xl p-8">
-            <h2 className="text-3xl font-bold font-poppins mb-4">
-              Special Launch Price
-            </h2>
-            <p className="text-xl mb-6">
-              Get your first canister for just {formatPrice(699)}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-white text-accent-1 text-lg font-semibold hover:bg-gray-100 rounded-lg px-6 py-3 "
-                onClick={() => setActiveTab('individual')}
-              >
-                Shop Individual
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="border-2 border-white text-white hover:bg-white hover:text-accent-1 font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-                onClick={() => setActiveTab('combo')}
-              >
-                View Combos
-              </motion.button>
-            </div>
-          </div>
-        </motion.div>
+       
       </div>
     </main>
   )
@@ -413,21 +379,36 @@ function ComboCard({ combo }: { combo: any }) {
           </div>
         </div>
 
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={handleAddToCart}
-          className="w-full btn-primary flex items-center justify-center space-x-2 relative overflow-hidden"
-        >
-          <motion.div
-            className="absolute inset-0 bg-white/20"
-            initial={{ x: '-100%' }}
-            whileHover={{ x: '100%' }}
-            transition={{ duration: 0.6 }}
-          />
-          <Gift className="w-4 h-4 relative z-10" />
-          <span className="relative z-10">Add Combo to Cart</span>
-        </motion.button>
+        <div className="flex gap-2">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleAddToCart}
+            className="flex-1 btn-primary flex items-center justify-center space-x-2 relative overflow-hidden"
+          >
+            <motion.div
+              className="absolute inset-0 bg-white/20"
+              initial={{ x: '-100%' }}
+              whileHover={{ x: '100%' }}
+              transition={{ duration: 0.6 }}
+            />
+            <ShoppingCart className="w-4 h-4 relative z-10" />
+            <span className="relative z-10">Add to Cart</span>
+          </motion.button>
+          
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => {
+              handleAddToCart()
+              window.location.href = '/checkout'
+            }}
+            className="flex-1 bg-gradient-to-r from-accent-1 to-accent-2 hover:from-accent-1/90 hover:to-accent-2/90 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+          >
+            <CreditCard className="w-4 h-4" />
+            <span>Buy Now</span>
+          </motion.button>
+        </div>
       </div>
     </motion.div>
   )

@@ -1,3 +1,5 @@
+import { isTestMode, getTestModeConfig, generateMockPaymentResponse } from './test-utils'
+
 export interface RazorpayOptions {
   key: string
   amount: number
@@ -37,6 +39,20 @@ export const loadRazorpay = async (): Promise<any> => {
 }
 
 export const openRazorpay = (options: RazorpayOptions) => {
+  if (isTestMode()) {
+    // Mock payment flow for testing
+    console.log('🧪 Test Mode: Simulating Razorpay payment...')
+    
+    // Simulate payment success after 2 seconds
+    setTimeout(() => {
+      const mockResponse = generateMockPaymentResponse(options.order_id)
+      console.log('🧪 Test Mode: Payment successful', mockResponse)
+      options.handler(mockResponse)
+    }, 2000)
+    
+    return
+  }
+
   const Razorpay = (window as any).Razorpay
   if (Razorpay) {
     const rzp = new Razorpay(options)

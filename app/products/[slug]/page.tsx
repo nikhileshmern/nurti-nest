@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useCart } from '@/context/CartContext'
 import { formatPrice } from '@/lib/utils'
-import { ShoppingCart, Star, Heart, Shield, Truck, RotateCcw, User, Send } from 'lucide-react'
+import { ShoppingCart, Star, Heart, Shield, Truck, RotateCcw, User, Send, CreditCard } from 'lucide-react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import FAQ from '@/components/FAQ'
@@ -19,7 +19,7 @@ const productData = {
     longDescription: 'Our YumBurst Orange Gummies are specially formulated for children aged 4+ to support healthy vision development. Each gummy contains a perfect blend of essential nutrients including Vitamin A for night vision, Lutein and Zeaxanthin for blue light protection, and Vitamin C & E for antioxidant support. Made with natural orange flavoring and no artificial colors, these gummies are 100% vegan and safe for daily consumption.',
     price: 699,
     originalPrice: 899,
-    image_url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop',
+    image_url: '/images/products/orange-gummy.png',
     stock: 50,
     rating: 4.8,
     reviewCount: 234,
@@ -136,7 +136,7 @@ const productData = {
     longDescription: 'Our YumBurst Pomegranate Gummies combine the power of pomegranate antioxidants with essential eye health nutrients. These delicious gummies are perfect for children who love fruity flavors while getting the nutrition they need for healthy vision. Each gummy is packed with Lutein and Zeaxanthin for blue light protection, Vitamin A for eye development, and natural pomegranate antioxidants.',
     price: 699,
     originalPrice: 899,
-    image_url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop',
+    image_url: '/images/products/pomogranate-gummy.png',
     stock: 30,
     rating: 4.8,
     reviewCount: 234,
@@ -412,14 +412,30 @@ export default function ProductPage({ params }: ProductPageProps) {
                 </div>
               </div>
 
-              <button
-                onClick={handleAddToCart}
-                disabled={product.stock === 0}
-                className="w-full btn-primary flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ShoppingCart className="w-4 h-4" />
-                <span>{product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}</span>
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleAddToCart}
+                  disabled={product.stock === 0}
+                  className="flex-1 btn-primary flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ShoppingCart className="w-4 h-4" />
+                  <span>{product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}</span>
+                </button>
+                
+                <button
+                  onClick={() => {
+                    if (product.stock > 0) {
+                      handleAddToCart()
+                      window.location.href = '/checkout'
+                    }
+                  }}
+                  disabled={product.stock === 0}
+                  className="flex-1 bg-gradient-to-r from-accent-1 to-accent-2 hover:from-accent-1/90 hover:to-accent-2/90 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <CreditCard className="w-4 h-4" />
+                  <span>{product.stock === 0 ? 'Out of Stock' : 'Buy Now'}</span>
+                </button>
+              </div>
             </div>
 
             {/* Trust Badges */}
