@@ -243,6 +243,72 @@ const productData = {
         answer: 'Our gummies are made with natural ingredients and are generally well-tolerated. In rare cases, children might experience mild digestive discomfort. If any adverse reactions occur, discontinue use and consult your doctor.'
       }
     ]
+  },
+  'test-product-rs1': {
+    id: 'test-1',
+    name: '🧪 Test Product - ₹1',
+    slug: 'test-product-rs1',
+    flavour: 'Test',
+    description: '⚠️ TEST PRODUCT ONLY ⚠️ - This is a ₹1 test product for testing the complete order flow in production mode.',
+    longDescription: 'This is a test product priced at ₹1 to help you test your complete e-commerce flow including payment processing, order management, shipping integration, and notifications - all without spending much money. Use this to verify that Razorpay payments, Supabase database, Shiprocket shipments, email notifications, and WhatsApp messages are all working correctly before going live with real products.',
+    price: 1,
+    originalPrice: 1,
+    image_url: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop',
+    stock: 999,
+    rating: 5.0,
+    reviewCount: 1,
+    benefits: [
+      'Test payment processing (Razorpay)',
+      'Test database operations (Supabase)',
+      'Test shipping integration (Shiprocket)',
+      'Test email notifications',
+      'Test WhatsApp messages',
+      'Only ₹1 per test - very affordable!'
+    ],
+    ingredients: [
+      'This is a test product',
+      'Not for actual consumption',
+      'For testing purposes only'
+    ],
+    nutritionFacts: {
+      servingSize: 'N/A',
+      servingsPerContainer: 'N/A',
+      calories: 'N/A',
+      totalCarbohydrates: 'N/A',
+      sugars: 'N/A',
+      vitaminA: 'N/A',
+      vitaminC: 'N/A',
+      vitaminE: 'N/A',
+      lutein: 'N/A',
+      zeaxanthin: 'N/A'
+    },
+    reviews: [
+      {
+        id: '1',
+        name: 'Test User',
+        rating: 5.0,
+        date: '2024-10-30',
+        comment: 'Perfect for testing! Works great.',
+        verified: true
+      }
+    ],
+    faqs: [
+      {
+        id: '1',
+        question: 'What is this product for?',
+        answer: 'This is a test product for testing your complete e-commerce order flow for only ₹1. Use it to verify payments, shipping, and notifications work correctly.'
+      },
+      {
+        id: '2',
+        question: 'How do I use this test product?',
+        answer: 'Simply add it to cart, complete the checkout process, and verify that payment is captured, order is saved in database, shipment is created in Shiprocket, and notifications are sent.'
+      },
+      {
+        id: '3',
+        question: 'Can I delete this after testing?',
+        answer: 'Yes! After successful testing, you can remove this product from your catalog. It\'s only meant for testing purposes.'
+      }
+    ]
   }
 }
 

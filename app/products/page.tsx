@@ -1,14 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ProductCard from '@/components/ProductCard'
 import { motion, AnimatePresence } from 'framer-motion'
 import { formatPrice } from '@/lib/utils'
 import { useCart } from '@/context/CartContext'
 import { Eye, Monitor, Leaf, Award, Star, ShoppingCart, Truck, Package, Heart, CreditCard } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 
-// Sample products data
-const individualProducts = [
+// Fallback products data (used if database fetch fails)
+const fallbackIndividualProducts = [
   {
     id: '1',
     name: 'YumBurst Orange Gummies',
@@ -33,10 +34,22 @@ const individualProducts = [
     stock: 30,
     category: 'individual'
   },
+  {
+    id: 'test-1',
+    name: '🧪 Test Product - ₹1',
+    slug: 'test-product-rs1',
+    flavour: 'Test',
+    description: '⚠️ TEST PRODUCT ONLY ⚠️ - This is a ₹1 test product for testing the complete order flow in production mode. Use this to test payments, shipping, and notifications without spending much money.',
+    price: 1,
+    originalPrice: 1,
+    image_url: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop',
+    stock: 999,
+    category: 'individual'
+  },
 ]
 
-// Sample combos data
-const comboProducts = [
+// Fallback combos data (used if database fetch fails)
+const fallbackComboProducts = [
   {
     id: 'combo-1',
     name: 'YumBurst Combo Pack',
@@ -62,14 +75,133 @@ const comboProducts = [
   }
 ]
 
-const tabs = [
-  { id: 'all', label: 'All Products', count: individualProducts.length + comboProducts.length },
-  { id: 'individual', label: 'Individual', count: individualProducts.length },
-  { id: 'combo', label: 'Combos', count: comboProducts.length },
-]
-
 export default function ProductsPage() {
   const [activeTab, setActiveTab] = useState('all')
+  const [individualProducts, setIndividualProducts] = useState(fallbackIndividualProducts)
+  const [comboProducts, setComboProducts] = useState(fallbackComboProducts)
+  const [loading, setLoading] = useState(true)
+  const [usingFallback, setUsingFallback] = useState(false)
+
+  // Fetch products from database
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true)
+        
+        // Fetch individual products
+        const { data: productsData, error: productsError } = await supabase
+          .from('products')
+          .select('*')
+          .order('created_at', { ascending: true })
+
+        // Fetch combos
+        const { data: combosData, error: combosError } = await supabase
+          .from('combos')
+          .select('*')
+          .order('created_at', { ascending: true })
+
+        if (productsError || combosError) {
+          console.error('Error fetching products:', productsError || combosError)
+          setUsingFallback(true)
+          return
+        }
+
+        // Transform database products to match component format
+        if (productsData && productsData.length > 0) {
+          const transformedProducts = productsData.map((product: any) => {
+            // Map database image URLs to local images
+            let localImageUrl = product.image_url
+            
+            // Use local images based on product name or slug
+            if (product.slug === 'yumburst-orange-gummies' || product.name.toLowerCase().includes('orange')) {
+              localImageUrl = '/images/products/orange-gummy.png'
+            } else if (product.slug === 'yumburst-pomegranate-gummies' || product.name.toLowerCase().includes('pomegranate')) {
+              localImageUrl = '/images/products/pomogranate-gummy.png'
+            } else if (product.slug === 'test-product-rs1' || product.name.includes('Test Product')) {
+              localImageUrl = '/images/products/orange-gummy.png' // Use orange gummy as test product image
+            } else if (product.image_url && !product.image_url.startsWith('http')) {
+              // Already a local path, use as is
+              localImageUrl = product.image_url
+            } else {
+              // Default fallback to orange gummy
+              localImageUrl = '/images/products/orange-gummy.png'
+            }
+            
+            return {
+              id: product.id,
+              name: product.name,
+              slug: product.slug,
+              flavour: product.flavour,
+              description: product.description,
+              price: Math.round(product.price / 100), // Convert paise to rupees
+              originalPrice: Math.round((product.price / 100) * 1.29), // Calculate original price (22% off)
+              image_url: localImageUrl,
+              stock: product.stock,
+              category: 'individual'
+            }
+          })
+          setIndividualProducts(transformedProducts)
+          console.log('✅ Loaded products from database:', transformedProducts.length)
+        } else {
+          console.log('⚠️ No products in database, using fallback')
+          setUsingFallback(true)
+        }
+
+        // Transform database combos to match component format
+        if (combosData && combosData.length > 0) {
+          const transformedCombos = combosData.map((combo: any) => {
+            // Use local combo image
+            let localImageUrl = '/images/products/combo-pack.png'
+            
+            // If database has local path, use it
+            if (combo.image_url && !combo.image_url.startsWith('http')) {
+              localImageUrl = combo.image_url
+            }
+            
+            return {
+              id: combo.id,
+              name: combo.name,
+              slug: combo.name.toLowerCase().replace(/\s+/g, '-'),
+              flavour: 'Mixed',
+              description: combo.description,
+              price: Math.round(combo.price / 100), // Convert paise to rupees
+              originalPrice: Math.round((combo.price / 100) * 1.08), // Calculate original price
+              image_url: localImageUrl,
+              stock: 50,
+              category: 'combo',
+              discount: combo.discount_percentage || 7,
+              includedProducts: [
+                { name: 'YumBurst Orange Gummies', flavour: 'Orange' },
+                { name: 'YumBurst Pomegranate Gummies', flavour: 'Pomegranate' }
+              ],
+              benefits: [
+                `Save ${combo.discount_percentage}% compared to buying separately`,
+                'Perfect for trying both flavors',
+                'Free shipping on orders above ₹500',
+                '30-day satisfaction guarantee'
+              ]
+            }
+          })
+          setComboProducts(transformedCombos)
+          console.log('✅ Loaded combos from database:', transformedCombos.length)
+        }
+
+      } catch (error) {
+        console.error('Error in fetchProducts:', error)
+        setUsingFallback(true)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProducts()
+  }, [])
+
+  const tabs = [
+    { id: 'all', label: 'All Products', count: individualProducts.length + comboProducts.length },
+    { id: 'individual', label: 'Individual', count: individualProducts.length },
+    { id: 'combo', label: 'Combos', count: comboProducts.length },
+  ]
 
   const getFilteredProducts = () => {
     switch (activeTab) {
@@ -103,6 +235,22 @@ export default function ProductsPage() {
           </p>
         </motion.div>
 
+        {/* Database Status Indicator */}
+        {usingFallback && !loading && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-2xl mx-auto mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4"
+          >
+            <div className="flex items-center space-x-2 text-yellow-800">
+              <span className="text-lg">⚠️</span>
+              <p className="text-sm">
+                <strong>Using fallback data.</strong> Could not connect to database. Showing default products.
+              </p>
+            </div>
+          </motion.div>
+        )}
+
         {/* Tabs */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -134,7 +282,16 @@ export default function ProductsPage() {
           ))}
         </motion.div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-1 mb-4"></div>
+            <p className="text-gray-600">Loading products from database...</p>
+          </div>
+        )}
+
         {/* Products Grid */}
+        {!loading && (
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -161,6 +318,7 @@ export default function ProductsPage() {
             ))}
           </motion.div>
         </AnimatePresence>
+        )}
 
         {/* Product Benefits */}
         <motion.div 

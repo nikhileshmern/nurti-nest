@@ -39,32 +39,55 @@ export const generateMockPaymentResponse = (orderId: string) => {
 }
 
 export const generateMockShipmentResponse = (orderId: string) => {
+  const timestamp = Date.now()
   return {
-    order_id: orderId,
-    awb: `AWB${Date.now()}`,
-    tracking_url: `https://test-tracking.shiprocket.in/track/${Date.now()}`,
+    order_id: 12345,
+    shipment_id: 67890,
+    awb_code: `TEST${timestamp}`,
+    awb: `TEST${timestamp}`,
+    tracking_url: `https://test-tracking.shiprocket.in/track/${timestamp}`,
     status: 'confirmed',
     courier_name: 'Test Courier',
+    courier_company_id: 1,
     courier_id: 'test_courier_123'
   }
 }
 
 export const generateMockTrackingResponse = (awb: string) => {
   return {
-    awb: awb,
-    status: 'In Transit',
+    awb_code: awb,
     current_status: 'Picked up from origin',
-    estimated_delivery_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-    tracking_events: [
+    shipment_status: 'In Transit',
+    shipment_track: [
       {
+        date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
         status: 'Order Placed',
-        timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+        activity: 'Shipment has been created',
         location: 'Nutri Nest Warehouse'
       },
       {
-        status: 'Picked up from origin',
-        timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+        date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+        status: 'Picked Up',
+        activity: 'Picked up from origin',
         location: 'Nutri Nest Warehouse'
+      }
+    ],
+    shipment_track_activities: [
+      {
+        date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+        status: 'Order Placed',
+        activity: 'Shipment has been created',
+        location: 'Nutri Nest Warehouse',
+        'sr-status': '1',
+        'sr-status-label': 'Order Placed'
+      },
+      {
+        date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+        status: 'Picked Up',
+        activity: 'Picked up from origin',
+        location: 'Nutri Nest Warehouse',
+        'sr-status': '6',
+        'sr-status-label': 'Picked Up'
       }
     ]
   }

@@ -128,8 +128,8 @@ export default function CartPage() {
                 
                 <div className="flex justify-between">
                   <span className="text-gray-600">Shipping</span>
-                  <span className="font-semibold">
-                    {getTotalPrice() > 500 ? 'Free' : formatPrice(50)}
+                  <span className="font-semibold text-green-600">
+                    Free ✅
                   </span>
                 </div>
                 
@@ -137,19 +137,17 @@ export default function CartPage() {
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
                     <span className="text-primary-orange">
-                      {formatPrice(getTotalPrice() + (getTotalPrice() > 500 ? 0 : 50))}
+                      {formatPrice(getTotalPrice())}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {getTotalPrice() > 500 && (
-                <div className="bg-green-100 border border-green-200 rounded-lg p-3 mb-6">
-                  <p className="text-green-800 text-sm font-medium">
-                    🎉 You qualify for free shipping!
-                  </p>
-                </div>
-              )}
+              <div className="bg-green-100 border border-green-200 rounded-lg p-3 mb-6">
+                <p className="text-green-800 text-sm font-medium">
+                  🎉 FREE Shipping on All Orders!
+                </p>
+              </div>
 
               <Link href="/checkout" className="w-full btn-primary flex items-center justify-center space-x-2">
                 <span>Proceed to Checkout</span>

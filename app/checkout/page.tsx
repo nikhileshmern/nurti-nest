@@ -2,15 +2,17 @@
 
 import { useState, useEffect } from 'react'
 import { useCart } from '@/context/CartContext'
+import { useAuth } from '@/context/AuthContext'
 import { formatPrice } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, CreditCard, Truck, Shield, X, TestTube } from 'lucide-react'
+import { ArrowLeft, CreditCard, Truck, Shield, X, TestTube, User, LogIn } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function CheckoutPage() {
-  const { items, getTotalPrice, clearCart } = useCart()
+  const { items, getTotalPrice, clearCart, appliedCoupon, setAppliedCoupon } = useCart()
+  const { user } = useAuth() // Get current user
   const router = useRouter()
   const [isProcessing, setIsProcessing] = useState(false)
   const [isTestMode, setIsTestMode] = useState(false)
@@ -24,23 +26,43 @@ export default function CheckoutPage() {
     pincode: '',
   })
 
-  // Coupon state
+  // Pre-fill form if user is logged in
+  useEffect(() => {
+    if (user) {
+      setCustomerInfo(prev => ({
+        ...prev,
+        name: user.full_name || prev.name,
+        email: user.email || prev.email,
+        phone: user.phone || prev.phone,
+      }))
+    }
+  }, [user])
+
+  // Coupon state (local state for UI, shared state for actual coupon)
   const [couponCode, setCouponCode] = useState('')
-  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number; type: 'percentage' | 'fixed'; description: string } | null>(null)
   const [couponError, setCouponError] = useState('')
   const [showCoupons, setShowCoupons] = useState(false)
 
+  // Shipping is always free - no need to fetch rates
+  // Keeping state for future if needed
+  const [shippingRates, setShippingRates] = useState<any[]>([])
+  const [loadingShipping, setLoadingShipping] = useState(false)
+  const [customShipping, setCustomShipping] = useState<number>(0) // Always 0 (free)
+
   // Check if we're in test mode
   useEffect(() => {
-    setIsTestMode(process.env.NEXT_PUBLIC_TEST_MODE === 'true')
+    // Check both server and client side test mode flags
+    const testMode = process.env.NEXT_PUBLIC_TEST_MODE === 'true'
+    setIsTestMode(testMode)
+    console.log('🧪 Test mode detected:', testMode)
   }, [])
 
-  // Available coupons
+  // Available coupons (Shipping is always free, so no FREESHIP coupon needed)
   const availableCoupons = {
     'WELCOME50': { discount: 50, type: 'fixed' as const, description: 'Welcome discount' },
     'SAVE10': { discount: 10, type: 'percentage' as const, description: '10% off' },
     'SAVE20': { discount: 20, type: 'percentage' as const, description: '20% off' },
-    'FREESHIP': { discount: 50, type: 'fixed' as const, description: 'Free shipping' },
+    // 'FREESHIP' removed - shipping is always free now!
   }
 
   // Featured coupons to display
@@ -52,6 +74,17 @@ export default function CheckoutPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setCustomerInfo(prev => ({ ...prev, [name]: value }))
+
+    // Shipping is always free - no need to fetch rates
+    // Removed shipping rate fetching
+  }
+
+  // Shipping rates fetching disabled - shipping is always free
+  // Keeping function for reference if needed in future
+  const fetchShippingRates = async (pincode: string) => {
+    // Disabled - shipping is always free
+    console.log('ℹ️ Shipping rate fetch disabled - shipping is always FREE')
+    return
   }
 
   // Apply coupon
@@ -96,90 +129,195 @@ export default function CheckoutPage() {
     return appliedCoupon.discount
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsProcessing(true)
-
+  // Initialize Razorpay payment
+  const initializeRazorpay = (
+    razorpayKey: string,
+    amount: number,
+    currency: string,
+    orderId: string,
+    customerInfo: any,
+    isTestMode: boolean,
+    clearCart: () => void,
+    router: any,
+    setIsProcessing: (val: boolean) => void
+  ) => {
     try {
-      // Create Razorpay order
-      const response = await fetch('/api/razorpay/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, customerInfo }),
+      console.log('🚀 === INITIALIZING RAZORPAY ===')
+      console.log('Parameters:', {
+        razorpayKey: razorpayKey.substring(0, 15) + '...',
+        amount,
+        currency,
+        orderId,
+        customerName: customerInfo.name,
+        isTestMode
       })
-
-      if (!response.ok) {
-        throw new Error('Failed to create order')
+      
+      if (!(window as any).Razorpay) {
+        console.error('❌ Razorpay object not found on window')
+        toast.error('Payment service not loaded. Please refresh and try again.')
+        setIsProcessing(false)
+        return
       }
+      
+      console.log('✅ Razorpay object found on window')
 
-      const { orderId, amount, currency } = await response.json()
-
-      if (isTestMode) {
-        // Test mode: Simulate payment automatically
-        console.log('🧪 Test Mode: Simulating payment...')
-        toast.success('🧪 Processing test payment...')
-        
-        // Simulate payment success after 2 seconds
-        setTimeout(() => {
-          console.log('🧪 Test Mode: Payment successful!')
-          toast.success('🧪 Test Payment successful!')
+      const options = {
+        key: razorpayKey,
+        amount: amount,
+        currency: currency,
+        name: 'Nutri Nest',
+        description: 'YumBurst Gummies Order',
+        order_id: orderId,
+        prefill: {
+          name: customerInfo.name,
+          email: customerInfo.email,
+          contact: customerInfo.phone,
+        },
+        notes: {
+          address: customerInfo.address,
+        },
+        theme: {
+          color: '#FFA726',
+        },
+        handler: async (response: any) => {
+          // Payment successful
+          console.log(isTestMode ? '🧪 Test payment successful!' : 'Payment successful!', response)
+          toast.success(isTestMode ? '🧪 Test Payment successful!' : 'Payment successful!')
           clearCart()
           router.push(`/order-success?order_id=${orderId}`)
-        }, 2000)
-      } else {
-        // Production mode: Use real Razorpay
-        const script = document.createElement('script')
-        script.src = 'https://checkout.razorpay.com/v1/checkout.js'
-        script.onload = () => {
-          const options = {
-            key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-            amount: amount,
-            currency: currency,
-            name: 'Nutri Nest',
-            description: 'YumBurst Gummies Order',
-            order_id: orderId,
-            prefill: {
-              name: customerInfo.name,
-              email: customerInfo.email,
-              contact: customerInfo.phone,
-            },
-            notes: {
-              address: customerInfo.address,
-            },
-            theme: {
-              color: '#FFA726',
-            },
-            handler: async (response: any) => {
-              // Payment successful
-              toast.success('Payment successful!')
-              clearCart()
-              router.push(`/order-success?order_id=${orderId}`)
-            },
-            modal: {
-              ondismiss: () => {
-                toast.error('Payment cancelled')
-              },
-            },
-          }
-
-          const rzp = new (window as any).Razorpay(options)
-          rzp.open()
-        }
-
-        document.body.appendChild(script)
+        },
+        modal: {
+          ondismiss: () => {
+            console.log('Payment modal dismissed')
+            toast.error('Payment cancelled')
+            setIsProcessing(false)
+          },
+          escape: true,
+          backdropclose: false
+        },
       }
+
+      console.log(isTestMode ? '🧪 Opening Razorpay test checkout...' : 'Opening Razorpay checkout...')
+      console.log('Payment options:', options)
+      
+      const rzp = new (window as any).Razorpay(options)
+      
+      rzp.on('payment.failed', function (response: any) {
+        console.error('❌ Payment failed:', response.error)
+        toast.error(`Payment failed: ${response.error.description}`)
+        setIsProcessing(false)
+      })
+
+      rzp.open()
+      console.log('✅ Razorpay modal opened')
     } catch (error) {
-      console.error('Checkout error:', error)
-      toast.error('Failed to process payment. Please try again.')
-    } finally {
+      console.error('❌ Razorpay initialization error:', error)
+      toast.error('Payment initialization failed. Please try again.')
       setIsProcessing(false)
     }
   }
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    console.log('='.repeat(50))
+    console.log('🚀 PAYMENT FLOW STARTED')
+    console.log('='.repeat(50))
+    
+    setIsProcessing(true)
+
+    try {
+      console.log('Step 1: Creating Razorpay order...')
+      console.log('Items:', items)
+      console.log('Customer Info:', customerInfo)
+      console.log('User:', user ? `Logged in (${user.id})` : 'Guest checkout')
+      
+      // Create Razorpay order (include userId if logged in)
+      const response = await fetch('/api/razorpay/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          items, 
+          customerInfo,
+          discountAmount: calculateDiscount(),
+          userId: user?.id || null // Send user ID if logged in
+        }),
+      })
+
+      console.log('Order API Response Status:', response.status)
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        console.error('Order creation failed:', errorData)
+        throw new Error(errorData.error || 'Failed to create order')
+      }
+
+      const orderData = await response.json()
+      console.log('✅ Order created successfully:', orderData)
+      
+      const { orderId, amount, currency } = orderData
+
+      // Get Razorpay key from environment
+      const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID
+
+      if (!razorpayKey) {
+        console.error('Razorpay key not configured. Please set NEXT_PUBLIC_RAZORPAY_KEY_ID in .env.local')
+        toast.error('Payment configuration error. Please add Razorpay keys to .env.local')
+        setIsProcessing(false)
+        return
+      }
+      
+      console.log('Using Razorpay key:', razorpayKey.substring(0, 15) + '...')
+      console.log('Test mode:', isTestMode)
+
+      console.log(isTestMode ? '🧪 Test Mode: Loading Razorpay with test key...' : 'Loading Razorpay...')
+      console.log('Order details:', { orderId, amount, currency, razorpayKey })
+
+      // Check if Razorpay script is already loaded
+      if ((window as any).Razorpay) {
+        console.log('Razorpay script already loaded, initializing payment...')
+        initializeRazorpay(razorpayKey, amount, currency, orderId, customerInfo, isTestMode, clearCart, router, setIsProcessing)
+      } else {
+        // Load Razorpay script
+        const script = document.createElement('script')
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+        script.async = true
+        
+        script.onload = () => {
+          console.log('✅ Razorpay script loaded successfully')
+          setTimeout(() => {
+            initializeRazorpay(razorpayKey, amount, currency, orderId, customerInfo, isTestMode, clearCart, router, setIsProcessing)
+          }, 100)
+        }
+
+        script.onerror = (error) => {
+          console.error('❌ Failed to load Razorpay script:', error)
+          toast.error('Payment service unavailable. Please try again.')
+          setIsProcessing(false)
+        }
+
+        document.head.appendChild(script)
+      }
+    } catch (error) {
+      console.error('='.repeat(50))
+      console.error('❌ CHECKOUT ERROR CAUGHT')
+      console.error('='.repeat(50))
+      console.error('Error details:', error)
+      console.error('Error message:', error instanceof Error ? error.message : 'Unknown error')
+      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace')
+      
+      const errorMessage = error instanceof Error ? error.message : 'Failed to process payment'
+      toast.error(errorMessage + '. Please try again.')
+      setIsProcessing(false)
+    }
+    // Note: Don't set isProcessing to false here - let Razorpay modal handle it
+  }
+
   const discount = calculateDiscount()
   const subtotal = getTotalPrice()
-  const shipping = subtotal > 500 ? 0 : 50
-  const total = subtotal - discount + shipping
+  // Shipping is always FREE! 🎉
+  const shipping = 0 // Always free shipping
+  const total = subtotal - discount + shipping // shipping is always 0
 
   return (
     <main className="min-h-screen py-20 bg-gradient-to-br from-orange-50 via-white to-pink-50">
@@ -201,6 +339,60 @@ export default function CheckoutPage() {
             )}
           </div>
         </div>
+
+        {/* User Status Banner */}
+        {user ? (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4 flex items-center justify-between"
+          >
+            <div className="flex items-center space-x-3">
+              <div className="bg-green-100 rounded-full p-2">
+                <User className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-green-900">Logged in as {user.email}</p>
+                <p className="text-xs text-green-700">Your order will be saved to your account</p>
+              </div>
+            </div>
+            <Link href="/profile" className="text-sm text-green-600 hover:text-green-700 font-medium">
+              View Profile →
+            </Link>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="bg-blue-100 rounded-full p-2">
+                  <LogIn className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-blue-900">Guest Checkout</p>
+                  <p className="text-xs text-blue-700">Want to track your orders? Login or create an account</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Link 
+                  href={`/login?redirect=/checkout`}
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium px-3 py-1 border border-blue-300 rounded-lg hover:bg-blue-100 transition-colors"
+                >
+                  Login
+                </Link>
+                <Link 
+                  href={`/signup?redirect=/checkout`}
+                  className="text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1 rounded-lg transition-colors"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Customer Information */}
@@ -490,7 +682,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex items-center space-x-3">
                   <Truck className="w-5 h-5 text-green-500" />
-                  <span className="text-sm text-gray-600">Free Shipping over ₹500</span>
+                  <span className="text-sm text-gray-600">Free Shipping Always! 🎉</span>
                 </div>
               </div>
             </div>
@@ -514,6 +706,14 @@ export default function CheckoutPage() {
                   <li>• Shipment will be created with mock data</li>
                   <li>• Check console for detailed logs</li>
                 </ul>
+                <div className="mt-3">
+                  <Link 
+                    href="/payment-flow" 
+                    className="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-700 underline"
+                  >
+                    View Complete MCP Payment Flow →
+                  </Link>
+                </div>
               </div>
             )}
           </div>

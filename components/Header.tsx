@@ -1,25 +1,20 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useCart } from '@/context/CartContext'
 import { useAuth } from '@/context/AuthContext'
-import { ShoppingCart, Menu, X, Heart, User, LogOut, TestTube } from 'lucide-react'
+import { ShoppingCart, Menu, X, Heart, User, LogOut, Package } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import CartDrawer from './CartDrawer'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
-  const [isTestMode, setIsTestMode] = useState(false)
   const { getTotalItems, isCartOpen, setIsCartOpen } = useCart()
   const { user, signOut } = useAuth()
   const pathname = usePathname()
-
-  useEffect(() => {
-    setIsTestMode(process.env.NEXT_PUBLIC_TEST_MODE === 'true')
-  }, [])
 
   const navigation = [
     { name: 'Home', href: '/' },
@@ -27,7 +22,6 @@ export default function Header() {
     { name: 'Learn', href: '/learn' },
     { name: 'About', href: '/about' },
     { name: 'Contact', href: '/contact' },
-    ...(isTestMode ? [{ name: 'Test Flow', href: '/test-flow', icon: TestTube }] : []),
   ]
 
   return (
@@ -63,13 +57,12 @@ export default function Header() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`relative font-medium transition-colors duration-200 flex items-center space-x-1 ${
+                  className={`relative font-medium transition-colors duration-200 ${
                     isActive
                       ? 'text-accent-1'
                       : 'text-text hover:text-accent-1'
                   }`}
                 >
-                  {item.icon && <item.icon className="w-4 h-4" />}
                   <span>{item.name}</span>
                   {isActive && (
                     <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-accent-1 rounded-full" />
@@ -105,14 +98,12 @@ export default function Header() {
               <div className="relative">
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center space-x-2 p-2 hover:bg-orange-100 rounded-full transition-colors"
+                  className="p-1 hover:opacity-80 transition-opacity"
+                  aria-label="User menu"
                 >
-                  <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4 text-white" />
+                  <div className="w-9 h-9 bg-gradient-to-br from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md">
+                    {(user.full_name || user.email || 'U').charAt(0).toUpperCase()}
                   </div>
-                  <span className="hidden md:block text-text font-medium">
-                    {user.full_name || 'User'}
-                  </span>
                 </button>
 
                 {/* User Dropdown */}
@@ -122,26 +113,58 @@ export default function Header() {
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-[60]"
+                      className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-[60]"
                     >
-                      <Link
-                        href="/profile"
-                        className="flex items-center space-x-3 px-4 py-2 text-text hover:bg-gray-50 transition-colors"
-                        onClick={() => setIsUserMenuOpen(false)}
-                      >
-                        <User className="w-4 h-4" />
-                        <span>My Profile</span>
-                      </Link>
-                      <button
-                        onClick={() => {
-                          signOut()
-                          setIsUserMenuOpen(false)
-                        }}
-                        className="w-full flex items-center space-x-3 px-4 py-2 text-text hover:bg-gray-50 transition-colors"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        <span>Sign Out</span>
-                      </button>
+                      {/* User Info Header */}
+                      <div className="px-4 py-3 bg-gradient-to-r from-orange-50 to-pink-50 border-b border-gray-200">
+                        <p className="text-sm font-semibold text-gray-900 truncate">
+                          {user.full_name || 'User'}
+                        </p>
+                        <p className="text-xs text-gray-600 truncate">
+                          {user.email}
+                        </p>
+                      </div>
+
+                      {/* Menu Items */}
+                      <div className="py-2">
+                        <Link
+                          href="/profile"
+                          className="flex items-center space-x-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          <User className="w-4 h-4 text-gray-500" />
+                          <span className="text-sm">Profile</span>
+                        </Link>
+                        <Link
+                          href="/orders"
+                          className="flex items-center space-x-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          <Package className="w-4 h-4 text-gray-500" />
+                          <span className="text-sm">My Orders</span>
+                        </Link>
+                        <Link
+                          href="/wishlist"
+                          className="flex items-center space-x-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          <Heart className="w-4 h-4 text-gray-500" />
+                          <span className="text-sm">Wishlist</span>
+                        </Link>
+                        
+                        <div className="border-t border-gray-200 my-2"></div>
+                        
+                        <button
+                          onClick={() => {
+                            signOut()
+                            setIsUserMenuOpen(false)
+                          }}
+                          className="w-full flex items-center space-x-3 px-4 py-2.5 text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          <span className="text-sm">Sign Out</span>
+                        </button>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>

@@ -12,6 +12,13 @@ export interface CartItem {
   quantity: number
 }
 
+export interface AppliedCoupon {
+  code: string
+  discount: number
+  type: 'percentage' | 'fixed'
+  description: string
+}
+
 interface CartContextType {
   items: CartItem[]
   addItem: (item: Omit<CartItem, 'quantity'>) => void
@@ -22,6 +29,8 @@ interface CartContextType {
   getTotalItems: () => number
   isCartOpen: boolean
   setIsCartOpen: (open: boolean) => void
+  appliedCoupon: AppliedCoupon | null
+  setAppliedCoupon: (coupon: AppliedCoupon | null) => void
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -29,6 +38,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null)
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -40,12 +50,31 @@ export function CartProvider({ children }: { children: ReactNode }) {
         console.error('Error loading cart from localStorage:', error)
       }
     }
+
+    // Load coupon from localStorage
+    const savedCoupon = localStorage.getItem('nutri-nest-coupon')
+    if (savedCoupon) {
+      try {
+        setAppliedCoupon(JSON.parse(savedCoupon))
+      } catch (error) {
+        console.error('Error loading coupon from localStorage:', error)
+      }
+    }
   }, [])
 
   // Save cart to localStorage whenever items change
   useEffect(() => {
     localStorage.setItem('nutri-nest-cart', JSON.stringify(items))
   }, [items])
+
+  // Save coupon to localStorage whenever it changes
+  useEffect(() => {
+    if (appliedCoupon) {
+      localStorage.setItem('nutri-nest-coupon', JSON.stringify(appliedCoupon))
+    } else {
+      localStorage.removeItem('nutri-nest-coupon')
+    }
+  }, [appliedCoupon])
 
   const addItem = (item: Omit<CartItem, 'quantity'>) => {
     setItems(prevItems => {
@@ -97,6 +126,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = () => {
     setItems([])
+    setAppliedCoupon(null) // Also clear coupon when cart is cleared
     toast.success('Cart cleared!')
   }
 
@@ -120,6 +150,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         getTotalItems,
         isCartOpen,
         setIsCartOpen,
+        appliedCoupon,
+        setAppliedCoupon,
       }}
     >
       {children}

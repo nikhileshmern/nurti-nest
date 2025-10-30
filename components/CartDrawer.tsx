@@ -164,18 +164,17 @@ function RecommendedProducts({ items, onClose, addItem }: { items: any[], onClos
 }
 
 export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
-  const { items, updateQuantity, removeItem, getTotalPrice, getTotalItems, clearCart, addItem } = useCart()
+  const { items, updateQuantity, removeItem, getTotalPrice, getTotalItems, clearCart, addItem, appliedCoupon, setAppliedCoupon } = useCart()
   const [couponCode, setCouponCode] = useState('')
-  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number; type: 'percentage' | 'fixed'; description: string } | null>(null)
   const [couponError, setCouponError] = useState('')
   const [showCoupons, setShowCoupons] = useState(false)
 
-  // Available coupons
+  // Available coupons (Shipping is always free, so no FREESHIP coupon needed)
   const availableCoupons = {
     'WELCOME50': { discount: 50, type: 'fixed' as const, description: 'Welcome discount' },
     'SAVE10': { discount: 10, type: 'percentage' as const, description: '10% off' },
     'SAVE20': { discount: 20, type: 'percentage' as const, description: '20% off' },
-    'FREESHIP': { discount: 50, type: 'fixed' as const, description: 'Free shipping' },
+    // 'FREESHIP' removed - shipping is always free now!
   }
 
   // Featured coupons to display
@@ -248,8 +247,8 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
   const discount = calculateDiscount()
   const subtotal = getTotalPrice()
-  const shipping = subtotal > 500 ? 0 : 50
-  const total = subtotal - discount + shipping
+  const shipping = 0 // Always FREE shipping! 🎉
+  const total = subtotal - discount + shipping // shipping is always 0
 
   // Handle ESC key to close drawer
   useEffect(() => {

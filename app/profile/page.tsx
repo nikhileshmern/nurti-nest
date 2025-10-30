@@ -76,10 +76,10 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen py-20 bg-premium-gradient bg-luxury-pattern">
+      <main className="min-h-screen py-20 bg-gradient-to-br from-orange-50 via-white to-pink-50">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-1"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
           </div>
         </div>
       </main>
@@ -91,28 +91,20 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="min-h-screen py-20 bg-premium-gradient bg-luxury-pattern">
+    <main className="min-h-screen py-20 bg-gradient-to-br from-orange-50 via-white to-pink-50">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-4xl mx-auto">
           {/* Header */}
           <motion.div 
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-12"
+            transition={{ duration: 0.5 }}
+            className="mb-8"
           >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="w-24 h-24 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-6"
-            >
-              <User className="w-12 h-12 text-white" />
-            </motion.div>
-            <h1 className="text-4xl font-bold text-gradient-logo font-poppins mb-4">
+            <h1 className="text-3xl font-bold text-gray-900 font-poppins mb-2">
               My Profile
             </h1>
-            <p className="text-text-dark">
+            <p className="text-gray-600">
               Manage your account information and preferences.
             </p>
           </motion.div>
@@ -125,9 +117,9 @@ export default function ProfilePage() {
               transition={{ duration: 0.8, delay: 0.3 }}
               className="lg:col-span-2"
             >
-              <div className="card-premium p-8">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gradient-natural font-poppins">
+                  <h2 className="text-xl font-semibold text-gray-900 font-poppins">
                     Personal Information
                   </h2>
                   {!isEditing ? (
@@ -135,18 +127,18 @@ export default function ProfilePage() {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={handleEdit}
-                      className="flex items-center space-x-2 text-accent-1 hover:text-accent-2 transition-colors"
+                      className="flex items-center space-x-2 text-orange-600 hover:text-orange-700 transition-colors font-medium"
                     >
                       <Edit className="w-4 h-4" />
                       <span>Edit</span>
                     </motion.button>
                   ) : (
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-3">
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={handleSave}
-                        className="flex items-center space-x-2 text-highlight hover:text-green-600 transition-colors"
+                        className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                       >
                         <Save className="w-4 h-4" />
                         <span>Save</span>
@@ -155,7 +147,7 @@ export default function ProfilePage() {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={handleCancel}
-                        className="flex items-center space-x-2 text-accent-2 hover:text-red-600 transition-colors"
+                        className="flex items-center space-x-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                       >
                         <X className="w-4 h-4" />
                         <span>Cancel</span>
@@ -253,8 +245,8 @@ export default function ProfilePage() {
               className="space-y-6"
             >
               {/* Account Actions */}
-              <div className="card-premium p-6">
-                <h3 className="text-lg font-semibold text-gradient-natural font-poppins mb-4">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 font-poppins mb-4">
                   Account Actions
                 </h3>
                 <div className="space-y-3">
@@ -283,30 +275,27 @@ export default function ProfilePage() {
               </div>
 
               {/* Sign Out */}
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="card-premium p-6"
-              >
-                <h3 className="text-lg font-semibold text-gradient-natural font-poppins mb-4">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 font-poppins mb-3">
                   Sign Out
                 </h3>
-                <p className="text-text-dark text-sm mb-4">
+                <p className="text-gray-600 text-sm mb-4">
                   Sign out of your account on this device.
                 </p>
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={handleSignOut}
-                  className="w-full flex items-center justify-center space-x-2 py-3 px-4 bg-accent-2 text-white rounded-xl hover:bg-red-600 transition-colors"
+                  className="w-full flex items-center justify-center space-x-2 py-3 px-4 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Sign Out</span>
                 </motion.button>
-              </motion.div>
+              </div>
 
               {/* Account Stats */}
-              <div className="card-premium p-6">
-                <h3 className="text-lg font-semibold text-gradient-natural font-poppins mb-4">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 font-poppins mb-4">
                   Account Stats
                 </h3>
                 <div className="space-y-3">

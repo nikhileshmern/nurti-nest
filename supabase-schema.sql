@@ -1,9 +1,6 @@
 -- Nutri Nest Database Schema
 -- Run this in your Supabase SQL editor
 
--- Enable Row Level Security
-ALTER DATABASE postgres SET "app.jwt_secret" TO 'your-jwt-secret';
-
 -- Products table
 CREATE TABLE IF NOT EXISTS products (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -78,7 +75,7 @@ INSERT INTO products (name, slug, flavour, description, price, image_url, stock)
   'Orange',
   'Delicious orange-flavored eye-care gummies packed with essential nutrients for healthy vision. Made with natural ingredients and fortified with vitamins A, C, and E.',
   69900,
-  'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop',
+  '/images/products/orange-gummy.png',
   50
 ),
 (
@@ -87,7 +84,7 @@ INSERT INTO products (name, slug, flavour, description, price, image_url, stock)
   'Pomegranate',
   'Tasty pomegranate-flavored gummies rich in antioxidants for optimal eye health. Contains lutein and zeaxanthin for blue light protection.',
   69900,
-  'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop',
+  '/images/products/pomogranate-gummy.png',
   30
 );
 
@@ -99,7 +96,7 @@ INSERT INTO combos (name, description, price, discount_percentage, included_prod
   129900, -- ₹1299
   7, -- 7% discount
   ARRAY[(SELECT id FROM products WHERE slug = 'yumburst-orange-gummies'), (SELECT id FROM products WHERE slug = 'yumburst-pomegranate-gummies')],
-  'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop'
+  '/images/products/combo-pack.png'
 );
 
 -- Enable Row Level Security (RLS)
