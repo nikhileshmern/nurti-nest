@@ -183,6 +183,30 @@ export default function CheckoutPage() {
           // Payment successful
           console.log(isTestMode ? '🧪 Test payment successful!' : 'Payment successful!', response)
           toast.success(isTestMode ? '🧪 Test Payment successful!' : 'Payment successful!')
+
+          try {
+            // Confirm payment on server and create shipment immediately (no webhook dependency)
+            const confirmRes = await fetch('/api/razorpay/confirm', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: options.order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              })
+            })
+
+            const confirmData = await confirmRes.json()
+            if (!confirmRes.ok) {
+              console.error('❌ Payment confirm failed:', confirmData)
+              toast.error('Payment confirmed but fulfillment failed. We will complete it shortly.')
+            } else {
+              console.log('✅ Payment confirmed on server:', confirmData)
+            }
+          } catch (e) {
+            console.error('❌ Error confirming payment:', e)
+          }
+
           clearCart()
           router.push(`/order-success?order_id=${orderId}`)
         },
