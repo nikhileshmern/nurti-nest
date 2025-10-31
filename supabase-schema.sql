@@ -82,7 +82,7 @@ INSERT INTO products (name, slug, flavour, description, price, image_url, stock)
   'YumBurst Pomegranate Gummies',
   'yumburst-pomegranate-gummies',
   'Pomegranate',
-  'Tasty pomegranate-flavored gummies rich in antioxidants for optimal eye health. Contains lutein and zeaxanthin for blue light protection.',
+  'Tasty pomegranate-flavored gummies rich in antioxidants for optimal eye health. Gluten free.',
   69900,
   '/images/products/pomogranate-gummy.png',
   30
@@ -94,7 +94,7 @@ INSERT INTO combos (name, description, price, discount_percentage, included_prod
   'YumBurst Combo Pack',
   'Get both Orange and Pomegranate flavors at a special price! Perfect for trying both flavors.',
   129900, -- ₹1299
-  7, -- 7% discount
+  28, -- 28% discount (calculated from MRP 1798: (1798 - 1299) / 1798 * 100)
   ARRAY[(SELECT id FROM products WHERE slug = 'yumburst-orange-gummies'), (SELECT id FROM products WHERE slug = 'yumburst-pomegranate-gummies')],
   '/images/products/combo-pack.png'
 );

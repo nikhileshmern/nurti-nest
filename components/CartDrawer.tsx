@@ -122,8 +122,8 @@ function RecommendedProducts({ items, onClose, addItem }: { items: any[], onClos
                   onClick={onClose}
                   className="block mb-2"
                 >
-                  <div className="w-12 h-12 bg-gradient-to-br from-orange-50 to-red-50 rounded-lg flex items-center justify-center mx-auto mb-1.5 shadow-sm">
-                    <span className="text-2xl">{product.emoji}</span>
+                  <div className="w-12 h-12 rounded-lg overflow-hidden mx-auto mb-1.5 shadow-sm bg-gray-50">
+                    <Image src={product.image_url} alt={product.name} width={48} height={48} className="w-12 h-12 object-contain" />
                   </div>
                   <h4 className="text-[10px] font-bold text-gray-900 text-center line-clamp-1 mb-0.5">
                     {product.name}
@@ -174,6 +174,8 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     'WELCOME50': { discount: 50, type: 'fixed' as const, description: 'Welcome discount' },
     'SAVE10': { discount: 10, type: 'percentage' as const, description: '10% off' },
     'SAVE20': { discount: 20, type: 'percentage' as const, description: '20% off' },
+    // Hidden BOGO coupon, accepted when typed but not shown in lists
+    'NUTRINEST50': { discount: 0, type: 'bogo' as unknown as 'fixed', description: 'BOGO' },
     // 'FREESHIP' removed - shipping is always free now!
   }
 
@@ -196,16 +198,15 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     }
   }, [isOpen])
   
-  // Reset coupon when drawer closes
+  // Clean input error when drawer closes (keep applied coupon across pages)
   useEffect(() => {
     if (!isOpen) {
       setCouponCode('')
-      setAppliedCoupon(null)
       setCouponError('')
     }
   }, [isOpen])
 
-  // Apply coupon
+  // Apply coupon (supports hidden BOGO)
   const handleApplyCoupon = (code?: string) => {
     const upperCode = (code || couponCode).toUpperCase().trim()
     
@@ -214,18 +215,48 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
       return
     }
 
-    const coupon = availableCoupons[upperCode as keyof typeof availableCoupons]
+    const coupon = availableCoupons[upperCode as keyof typeof availableCoupons] as any
     
-    if (coupon) {
-      setAppliedCoupon({ code: upperCode, ...coupon })
-      setCouponError('')
-      setCouponCode('')
-      setShowCoupons(false)
-    } else {
+    if (!coupon) {
       setCouponError('Invalid coupon code')
       setAppliedCoupon(null)
+      return
     }
+
+    // Special handling for BOGO
+    if (upperCode === 'NUTRINEST50') {
+      const totalUnits = items.reduce((sum, it) => sum + it.quantity, 0)
+      if (totalUnits < 2) {
+        setCouponError('Add one more item to use this Buy 1 Get 1 offer')
+        return
+      }
+      // Note: Email validation will happen at checkout (cart drawer doesn't have customer email)
+    }
+
+    setAppliedCoupon({ code: upperCode, ...coupon })
+    setCouponError('')
+    setCouponCode('')
+    setShowCoupons(false)
   }
+
+  // Auto-apply BOGO when user adds the second item after entering code
+  useEffect(() => {
+    const upper = couponCode.toUpperCase().trim()
+    const totalUnits = items.reduce((sum, it) => sum + it.quantity, 0)
+    if (upper === 'NUTRINEST50' && !appliedCoupon && totalUnits >= 2) {
+      const coupon = availableCoupons['NUTRINEST50' as keyof typeof availableCoupons] as any
+      setAppliedCoupon({ code: 'NUTRINEST50', ...coupon })
+      setCouponError('')
+      setShowCoupons(false)
+    }
+    if ((appliedCoupon as any)?.type === 'bogo') {
+      if (totalUnits === 3) {
+        setCouponError('Add one more item to get another free!')
+      } else {
+        setCouponError('')
+      }
+    }
+  }, [items])
 
   // Remove coupon
   const handleRemoveCoupon = () => {
@@ -234,11 +265,21 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     setCouponError('')
   }
 
-  // Calculate discount
+  // Calculate discount (includes BOGO, max 2 free)
   const calculateDiscount = () => {
     if (!appliedCoupon) return 0
     
     const subtotal = getTotalPrice()
+    if ((appliedCoupon as any).type === 'bogo') {
+      // BOGO: one free for every pair; cap free units to 2 and choose cheapest units
+      const totalUnits = items.reduce((sum, it) => sum + it.quantity, 0)
+      if (totalUnits < 2) return 0
+      const freeUnits = Math.min(Math.floor(totalUnits / 2), 2)
+      const unitPrices: number[] = []
+      items.forEach(it => { for (let i = 0; i < it.quantity; i++) unitPrices.push(it.price) })
+      unitPrices.sort((a, b) => a - b)
+      return unitPrices.slice(0, freeUnits).reduce((s, p) => s + p, 0)
+    }
     if (appliedCoupon.type === 'percentage') {
       return Math.round((subtotal * appliedCoupon.discount) / 100)
     }

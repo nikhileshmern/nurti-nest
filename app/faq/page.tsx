@@ -23,7 +23,7 @@ export default function FAQPage() {
       questions: [
         {
           question: 'What is Nutri Nest?',
-          answer: 'Nutri Nest is a premium health supplement brand specializing in eye-care gummies for children aged 4+. Our products are designed to support visual clarity, filter blue light, and provide antioxidant support while being 100% vegan and delicious.'
+          answer: 'Nutri Nest is a premium health supplement brand specializing in eye-care gummies for children aged 4+. Our products are designed to support visual clarity, are gluten free, and provide antioxidant support while being 100% vegan and delicious.'
         },
         {
           question: 'Are your products safe for children?',

@@ -5,7 +5,7 @@ import Hero from '@/components/Hero'
 import ProductCard from '@/components/ProductCard'
 import TestimonialCard from '@/components/TestimonialCard'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Eye, Monitor, Leaf, Award, Star, Package, ShoppingCart, CreditCard } from 'lucide-react'
+import { Eye, Monitor, Leaf, Award, Star, Package, ShoppingCart, CreditCard, Heart } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { formatPrice } from '@/lib/utils'
 import { useCart } from '@/context/CartContext'
@@ -46,8 +46,8 @@ const comboProducts = [
     flavour: 'Mixed',
     description: 'Get both Orange and Pomegranate flavors at a special price! Perfect for trying both flavors and ensuring variety in your child\'s nutrition.',
     price: 1299,
-    originalPrice: 1398,
-    discountPercentage: 7,
+    originalPrice: 1798,
+    discountPercentage: 28,
     image_url: '/images/products/combo-pack.png',
     stock: 25,
     category: 'combo',
@@ -191,8 +191,8 @@ export default function HomePage() {
               >
                 <Monitor className="w-10 h-10 text-white" />
               </motion.div>
-              <h3 className="text-xl font-semibold font-poppins text-red-600">Blue Light Protection</h3>
-              <p className="text-gray-600">Helps filter harmful blue light from screens and devices.</p>
+              <h3 className="text-xl font-semibold font-poppins text-red-600">Gluten Free</h3>
+              <p className="text-gray-600">Made without gluten; gentle and suitable for gluten‑sensitive individuals.</p>
             </motion.div>
             
             <motion.div 
@@ -292,36 +292,34 @@ function ComboCard({ combo }: { combo: any }) {
   }
 
   return (
-    <motion.div
-      whileHover={{ y: -8, scale: 1.02 }}
-      className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 p-6 group relative overflow-hidden flex flex-col h-full"
+    <div
+      className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300 p-6 group relative overflow-hidden flex flex-col h-full"
     >
-      {/* Discount Badge */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="absolute top-4 right-4 z-10 bg-gradient-to-br from-red-500 to-pink-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg"
-      >
-        {combo.discountPercentage}% OFF
-      </motion.div>
+      {/* Floating discount badge removed; now shown beside price */}
 
-      {/* Combo Badge */}
-      <div className="absolute top-4 left-4 z-10 bg-gradient-to-br from-orange-500 to-yellow-600 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center space-x-1 shadow-lg">
-        <Package className="w-4 h-4" />
-        <span>COMBO</span>
+      {/* Best Value Badge */}
+      <div className="absolute top-4 left-4 z-10 bg-accent-1 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center space-x-1 shadow-lg">
+        <span>BEST VALUE</span>
       </div>
 
+      {/* Wishlist */}
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="absolute top-4 right-4 z-10 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-md hover:bg-white transition-colors"
+        aria-label="Add to wishlist"
+      >
+        <Heart className="w-5 h-5 text-gray-400 hover:text-red-500 transition-colors" />
+      </motion.button>
+
       <div className="relative mb-4">
-        <motion.div 
-          whileHover={{ scale: 1.05 }}
-          className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl overflow-hidden"
-        >
+        <div className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl overflow-hidden">
           <img
             src={combo.image_url}
             alt={combo.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
-        </motion.div>
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -330,6 +328,7 @@ function ComboCard({ combo }: { combo: any }) {
             {combo.name}
           </h3>
           <p className="text-sm text-accent-1 font-medium">Special Combo Pack</p>
+          <p className="text-xs text-gray-500">30 Nos each flavour</p>
         </div>
 
         <p className="text-gray-600 text-sm line-clamp-2">
@@ -387,13 +386,18 @@ function ComboCard({ combo }: { combo: any }) {
         <div className="flex-grow"></div>
 
         {/* Pricing */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <div className="text-2xl font-bold text-accent-1">
             {formatPrice(combo.price)}
           </div>
           <div className="text-lg text-gray-400 line-through">
             {formatPrice(combo.originalPrice)}
           </div>
+          {combo.discountPercentage > 0 && (
+            <span className="text-xs font-bold text-white bg-gradient-to-br from-red-500 to-pink-600 px-2 py-1 rounded-full shadow">
+              {combo.discountPercentage}% OFF
+            </span>
+          )}
         </div>
 
         <div className="flex gap-2">
@@ -427,6 +431,6 @@ function ComboCard({ combo }: { combo: any }) {
           </motion.button>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }

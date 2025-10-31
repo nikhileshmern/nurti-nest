@@ -5,7 +5,7 @@ import { isTestMode } from '@/lib/test-utils'
 
 export async function POST(request: NextRequest) {
   try {
-    const { items, customerInfo, userId, discountAmount } = await request.json() // Accept userId and discount
+    const { items, customerInfo, userId, discountAmount, couponCode } = await request.json() // Accept userId, discount and coupon
 
     // Calculate totals (apply discount, clamp to minimum ₹1)
     const subtotal = items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0)
@@ -67,6 +67,7 @@ export async function POST(request: NextRequest) {
               subtotal: subtotal,
               shipping: shipping,
               total: total,
+              coupon_code: couponCode || null,
               razorpay_order_id: razorpayOrder.id,
               shiprocket_awb: null,
               tracking_url: null,

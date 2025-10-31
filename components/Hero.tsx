@@ -1,10 +1,30 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Shield, Heart, Eye, Monitor, Leaf, Award } from 'lucide-react'
 
 export default function Hero() {
+  const [isMobile, setIsMobile] = useState(false)
+  const [reduced, setReduced] = useState(false)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsMobile(window.innerWidth < 768)
+      try {
+        setReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+      } catch {}
+    }
+  }, [])
+
+  const perfStyle = useMemo(() => ({
+    willChange: 'transform, opacity',
+    transform: 'translateZ(0)',
+    WebkitBackfaceVisibility: 'hidden' as const,
+    backfaceVisibility: 'hidden' as const,
+  }), [])
+
   return (
         <section
           className="min-h-[85vh] flex items-center relative overflow-hidden w-full bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 py-12"
@@ -14,10 +34,11 @@ export default function Hero() {
       {/* Large Gradient Background Blobs */}
       <motion.div 
         className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-orange-200 to-yellow-200 rounded-full blur-3xl opacity-30"
+        style={perfStyle}
         animate={{ 
-          y: [0, -30, 0],
-          x: [0, 20, 0],
-          scale: [1, 1.1, 1]
+          y: reduced ? 0 : [0, -30, 0],
+          x: reduced ? 0 : [0, 20, 0],
+          scale: reduced ? 1 : [1, 1.1, 1]
         }}
         transition={{ 
           duration: 10,
@@ -28,10 +49,11 @@ export default function Hero() {
       
       <motion.div 
         className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-red-200 to-pink-200 rounded-full blur-3xl opacity-30"
+        style={perfStyle}
         animate={{ 
-          y: [0, 30, 0],
-          x: [0, -20, 0],
-          scale: [1, 1.2, 1]
+          y: reduced ? 0 : [0, 30, 0],
+          x: reduced ? 0 : [0, -20, 0],
+          scale: reduced ? 1 : [1, 1.2, 1]
         }}
         transition={{ 
           duration: 12,
@@ -43,10 +65,11 @@ export default function Hero() {
       {/* Large Floating Orbs */}
       <motion.div 
         className="absolute top-20 right-20 w-32 h-32 bg-gradient-to-br from-orange-300/30 to-yellow-300/30 rounded-full blur-xl"
+        style={perfStyle}
         animate={{ 
-          y: [0, -20, 0],
-          x: [0, 10, 0],
-          scale: [1, 1.1, 1]
+          y: reduced ? 0 : [0, -20, 0],
+          x: reduced ? 0 : [0, 10, 0],
+          scale: reduced ? 1 : [1, 1.1, 1]
         }}
         transition={{ 
           duration: 8,
@@ -57,10 +80,11 @@ export default function Hero() {
       
       <motion.div 
         className="absolute bottom-20 left-20 w-24 h-24 bg-gradient-to-br from-red-300/30 to-pink-300/30 rounded-full blur-lg"
+        style={perfStyle}
         animate={{ 
-          y: [0, 20, 0],
-          x: [0, -15, 0],
-          scale: [1, 1.2, 1]
+          y: reduced ? 0 : [0, 20, 0],
+          x: reduced ? 0 : [0, -15, 0],
+          scale: reduced ? 1 : [1, 1.2, 1]
         }}
         transition={{ 
           duration: 6,
@@ -71,9 +95,10 @@ export default function Hero() {
       
       <motion.div 
         className="absolute top-1/2 right-1/4 w-16 h-16 bg-gradient-to-br from-orange-300/25 to-red-300/25 rounded-full blur-md"
+        style={perfStyle}
         animate={{ 
-          y: [0, -30, 0],
-          x: [0, 20, 0]
+          y: reduced ? 0 : [0, -30, 0],
+          x: reduced ? 0 : [0, 20, 0]
         }}
         transition={{ 
           duration: 7,
@@ -85,9 +110,10 @@ export default function Hero() {
       {/* Additional Floating Shapes */}
       <motion.div 
         className="absolute top-40 left-1/4 w-20 h-20 bg-gradient-to-br from-orange-300/25 to-yellow-300/25 rounded-full blur-lg"
+        style={perfStyle}
         animate={{ 
-          y: [0, 25, 0],
-          rotate: [0, 180, 360]
+          y: reduced ? 0 : [0, 25, 0],
+          rotate: reduced ? 0 : [0, 180, 360]
         }}
         transition={{ 
           duration: 10,
@@ -98,10 +124,11 @@ export default function Hero() {
 
       <motion.div 
         className="absolute bottom-40 right-1/3 w-14 h-14 bg-gradient-to-br from-red-300/20 to-pink-300/20 rounded-full blur-md"
+        style={perfStyle}
         animate={{ 
-          y: [0, -15, 0],
-          x: [0, 15, 0],
-          scale: [1, 1.3, 1]
+          y: reduced ? 0 : [0, -15, 0],
+          x: reduced ? 0 : [0, 15, 0],
+          scale: reduced ? 1 : [1, 1.3, 1]
         }}
         transition={{ 
           duration: 5,
@@ -111,7 +138,7 @@ export default function Hero() {
       />
 
       {/* Small Floating Particles - Random positions */}
-      {[...Array(20)].map((_, i) => {
+      {[...Array(isMobile ? 8 : 20)].map((_, i) => {
         const randomTop = Math.random() * 90 + 5; // 5% to 95%
         const randomLeft = Math.random() * 90 + 5; // 5% to 95%
         
@@ -120,13 +147,14 @@ export default function Hero() {
             key={i}
             className="absolute rounded-full"
             style={{
+              ...perfStyle,
               width: `${4 + (i % 3) * 2}px`,
               height: `${4 + (i % 3) * 2}px`,
               top: `${randomTop}%`,
               left: `${randomLeft}%`,
               background: i % 2 === 0 ? 'rgba(251, 146, 60, 0.35)' : 'rgba(251, 113, 133, 0.3)',
             }}
-            animate={{ 
+            animate={reduced ? { opacity: 0.4 } : {
               y: [0, -30 - (i % 3) * 10, 0],
               x: [0, (i % 2 === 0 ? 10 : -10), 0],
               opacity: [0.2, 0.7, 0.2],
@@ -145,9 +173,10 @@ export default function Hero() {
       {/* Pulsing Gradient Circles */}
       <motion.div 
         className="absolute top-1/3 left-10 w-40 h-40 bg-gradient-to-br from-orange-300/15 to-transparent rounded-full"
+        style={perfStyle}
         animate={{ 
-          scale: [1, 1.5, 1],
-          opacity: [0.3, 0.5, 0.3]
+          scale: reduced ? 1 : [1, 1.5, 1],
+          opacity: reduced ? 0.3 : [0.3, 0.5, 0.3]
         }}
         transition={{ 
           duration: 6,
@@ -158,9 +187,10 @@ export default function Hero() {
 
       <motion.div 
         className="absolute bottom-1/4 right-10 w-32 h-32 bg-gradient-to-tl from-red-300/15 to-transparent rounded-full"
+        style={perfStyle}
         animate={{ 
-          scale: [1, 1.4, 1],
-          opacity: [0.2, 0.6, 0.2]
+          scale: reduced ? 1 : [1, 1.4, 1],
+          opacity: reduced ? 0.2 : [0.2, 0.6, 0.2]
         }}
         transition={{ 
           duration: 5,
@@ -231,7 +261,7 @@ export default function Hero() {
                         className="text-lg text-text/80 leading-relaxed max-w-2xl mt-6 font-medium"
                       >
               Tasty eye-care gummies for kids aged 4+. Supports visual clarity, 
-              filters blue light, and provides antioxidant support. 100% Vegan.
+              is gluten free, and provides antioxidant support. 100% Vegan.
             </motion.p>
 
             <motion.div 
@@ -270,7 +300,7 @@ export default function Hero() {
                         </div>
                         <div className="flex items-center space-x-3">
                           <Monitor className="w-5 h-5 text-accent-1" />
-                          <span className="text-sm text-text font-medium">Blue Light Protection</span>
+                          <span className="text-sm text-text font-medium">Gluten Free</span>
                         </div>
             </motion.div>
               </motion.div>
@@ -281,10 +311,11 @@ export default function Hero() {
                 {/* Animated Glow Effects */}
                 <motion.div 
                   className="absolute inset-0 bg-gradient-to-br from-orange-400/10 via-transparent to-red-400/10 rounded-full blur-3xl"
+                  style={perfStyle}
                   animate={{ 
-                    scale: [1, 1.2, 1],
-                    opacity: [0.3, 0.6, 0.3],
-                    rotate: [0, 360]
+                    scale: reduced ? 1 : [1, 1.2, 1],
+                    opacity: reduced ? 0.4 : [0.3, 0.6, 0.3],
+                    rotate: reduced ? 0 : [0, 360]
                   }}
                   transition={{ 
                     duration: 8,
@@ -321,9 +352,10 @@ export default function Hero() {
                       src="/images/hero/bg-hero-1.png"
                       alt="Nutri Nest Pomegranate Power Gummies"
                       className="w-[26rem] h-auto object-contain"
+                      style={perfStyle}
                       animate={{
-                        rotate: [-5, -8, -5],
-                        y: [0, -15, 0]
+                        rotate: reduced ? 0 : [-5, -8, -5],
+                        y: reduced ? 0 : [0, -15, 0]
                       }}
                       transition={{
                         rotate: { 
@@ -349,9 +381,10 @@ export default function Hero() {
                   {/* Glow Ring for Pomegranate Product */}
                   <motion.div
                     className="absolute inset-0 -z-10 bg-gradient-to-br from-red-400/20 to-pink-400/20 rounded-full blur-2xl"
+                    style={perfStyle}
                     animate={{ 
-                      scale: [1, 1.3, 1],
-                      opacity: [0.5, 0.8, 0.5]
+                      scale: reduced ? 1 : [1, 1.3, 1],
+                      opacity: reduced ? 0.6 : [0.5, 0.8, 0.5]
                     }}
                     transition={{ 
                       duration: 3,
@@ -389,9 +422,10 @@ export default function Hero() {
                       src="/images/hero/bg-hero-2.png"
                       alt="Nutri Nest Orange Power Gummies"
                       className="w-[26rem] h-auto object-contain"
+                      style={perfStyle}
                       animate={{
-                        rotate: [5, 8, 5],
-                        y: [0, 15, 0]
+                        rotate: reduced ? 0 : [5, 8, 5],
+                        y: reduced ? 0 : [0, 15, 0]
                       }}
                       transition={{
                         rotate: { 
@@ -417,9 +451,10 @@ export default function Hero() {
                   {/* Glow Ring for Orange Product */}
                   <motion.div
                     className="absolute inset-0 -z-10 bg-gradient-to-br from-orange-400/20 to-yellow-400/20 rounded-full blur-2xl"
+                    style={perfStyle}
                     animate={{ 
-                      scale: [1, 1.3, 1],
-                      opacity: [0.5, 0.8, 0.5]
+                      scale: reduced ? 1 : [1, 1.3, 1],
+                      opacity: reduced ? 0.6 : [0.5, 0.8, 0.5]
                     }}
                     transition={{ 
                       duration: 3.2,

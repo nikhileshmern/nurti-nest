@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { notFound } from 'next/navigation'
 import { useCart } from '@/context/CartContext'
 import { formatPrice } from '@/lib/utils'
 import { ShoppingCart, Star, Heart, Shield, Truck, RotateCcw, User, Send, CreditCard } from 'lucide-react'
@@ -16,7 +17,7 @@ const productData = {
     slug: 'yumburst-orange-gummies',
     flavour: 'Orange',
     description: 'Delicious orange-flavored eye-care gummies packed with essential nutrients for healthy vision. Made with natural ingredients and fortified with vitamins A, C, and E.',
-    longDescription: 'Our YumBurst Orange Gummies are specially formulated for children aged 4+ to support healthy vision development. Each gummy contains a perfect blend of essential nutrients including Vitamin A for night vision, Lutein and Zeaxanthin for blue light protection, and Vitamin C & E for antioxidant support. Made with natural orange flavoring and no artificial colors, these gummies are 100% vegan and safe for daily consumption.',
+    longDescription: 'Our YumBurst Orange Gummies are specially formulated for children aged 4+ to support healthy vision development. Each gummy contains a perfect blend of essential nutrients including Vitamin A for night vision and Vitamin C & E for antioxidant support. Made without gluten, with natural orange flavoring and no artificial colors, these gummies are 100% vegan and safe for daily consumption.',
     price: 699,
     originalPrice: 899,
     image_url: '/images/products/orange-gummy.png',
@@ -25,7 +26,7 @@ const productData = {
     reviewCount: 234,
     benefits: [
       'Supports visual clarity and eye development',
-      'Filters harmful blue light from digital devices',
+      'Gluten free formulation',
       'Rich in antioxidants for overall eye health',
       '100% vegan and kid-safe ingredients',
       'Natural orange flavor kids love'
@@ -122,8 +123,8 @@ const productData = {
       },
       {
         id: '6',
-        question: 'Do these gummies really help with blue light protection?',
-        answer: 'Yes! Our gummies contain Lutein and Zeaxanthin, which are scientifically proven to filter harmful blue light and protect the eyes from digital screen exposure. Combined with Vitamin A, C, and E, they provide comprehensive eye protection.'
+        question: 'Are these gummies gluten free?',
+        answer: 'Yes! Our gummies are made without gluten and are produced with care to avoid common gluten sources. They are suitable for a gluten‑free lifestyle.'
       }
     ]
   },
@@ -132,8 +133,8 @@ const productData = {
     name: 'YumBurst Pomegranate Gummies',
     slug: 'yumburst-pomegranate-gummies',
     flavour: 'Pomegranate',
-    description: 'Tasty pomegranate-flavored gummies rich in antioxidants for optimal eye health. Contains lutein and zeaxanthin for blue light protection.',
-    longDescription: 'Our YumBurst Pomegranate Gummies combine the power of pomegranate antioxidants with essential eye health nutrients. These delicious gummies are perfect for children who love fruity flavors while getting the nutrition they need for healthy vision. Each gummy is packed with Lutein and Zeaxanthin for blue light protection, Vitamin A for eye development, and natural pomegranate antioxidants.',
+    description: 'Tasty pomegranate-flavored gummies rich in antioxidants for optimal eye health. Gluten free.',
+    longDescription: 'Our YumBurst Pomegranate Gummies combine the power of pomegranate antioxidants with essential eye health nutrients. These delicious gummies are perfect for children who love fruity flavors while getting the nutrition they need for healthy vision. Each gummy is made without gluten, includes Vitamin A for eye development, and natural pomegranate antioxidants.',
     price: 699,
     originalPrice: 899,
     image_url: '/images/products/pomogranate-gummy.png',
@@ -142,7 +143,7 @@ const productData = {
     reviewCount: 234,
     benefits: [
       'Rich in pomegranate antioxidants',
-      'Protects against blue light damage',
+      'Gluten free',
       'Supports healthy vision development',
       'Natural pomegranate flavor',
       '100% vegan and gluten-free'
@@ -319,6 +320,9 @@ interface ProductPageProps {
 }
 
 export default function ProductPage({ params }: ProductPageProps) {
+  if (params.slug === 'test-product-rs1') {
+    notFound()
+  }
   const { addItem } = useCart()
   const [quantity, setQuantity] = useState(1)
   const [activeTab, setActiveTab] = useState('description')

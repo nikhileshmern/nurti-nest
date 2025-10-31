@@ -41,19 +41,9 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <motion.div 
-      whileHover={{ y: -8, scale: 1.02 }}
-      className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 p-6 group relative overflow-hidden flex flex-col h-full"
+      className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300 p-6 group relative overflow-hidden flex flex-col h-full"
     >
-      {/* Discount Badge */}
-      {discountPercentage > 0 && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="absolute top-4 left-4 z-10 bg-gradient-to-br from-red-500 to-pink-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg"
-        >
-          {discountPercentage}% OFF
-        </motion.div>
-      )}
+      {/* Floating discount badge removed; shown near price instead */}
 
       {/* Wishlist Button */}
       <motion.button
@@ -64,38 +54,32 @@ export default function ProductCard({ product }: ProductCardProps) {
         <Heart className="w-5 h-5 text-gray-400 hover:text-red-500 transition-colors" />
       </motion.button>
 
-      <Link href={`/products/${product.slug}`}>
-        <div className="relative mb-4">
-          <motion.div 
-            whileHover={{ scale: 1.05 }}
-            className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl overflow-hidden"
-          >
-            <Image
-              src={product.image_url}
-              alt={product.name}
-              width={300}
-              height={300}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-            />
-          </motion.div>
-          {product.stock === 0 && (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm rounded-xl flex items-center justify-center"
-            >
-              <span className="text-white font-semibold text-lg">Out of Stock</span>
-            </motion.div>
-          )}
+      <Link href={`/products/${product.slug}`} className="block relative mb-4">
+        <div className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl overflow-hidden">
+          <Image
+            src={product.image_url}
+            alt={product.name}
+            width={300}
+            height={300}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
         </div>
+        {product.stock === 0 && (
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm rounded-xl flex items-center justify-center">
+            <span className="text-white font-semibold text-lg">Out of Stock</span>
+          </div>
+        )}
       </Link>
 
       <div className="space-y-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 font-poppins group-hover:text-primary-orange transition-colors">
-            {product.name}
-          </h3>
+          <Link href={`/products/${product.slug}`} className="block">
+            <h3 className="text-lg font-semibold text-gray-900 font-poppins hover:text-primary-orange transition-colors">
+              {product.name}
+            </h3>
+          </Link>
           <p className="text-sm text-primary-red font-medium">{product.flavour}</p>
+          <p className="text-xs text-gray-500">30 Nos</p>
         </div>
 
         <p className="text-gray-600 text-sm line-clamp-2">
@@ -122,13 +106,18 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="flex-grow"></div>
 
         {/* Pricing */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <span className="text-2xl font-bold text-primary-orange">
             {formatPrice(product.price)}
           </span>
           {product.originalPrice && (
             <span className="text-lg text-gray-400 line-through">
               {formatPrice(product.originalPrice)}
+            </span>
+          )}
+          {discountPercentage > 0 && (
+            <span className="text-xs font-bold text-white bg-gradient-to-br from-red-500 to-pink-600 px-2 py-1 rounded-full shadow">
+              {discountPercentage}% OFF
             </span>
           )}
         </div>

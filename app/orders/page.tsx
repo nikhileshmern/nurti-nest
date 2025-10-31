@@ -124,7 +124,7 @@ export default function OrdersPage() {
             transition={{ duration: 0.8 }}
             className="text-center mb-12"
           >
-            <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-4">
+            <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text  mb-4">
               My Orders
             </h1>
             <p className="text-gray-600">

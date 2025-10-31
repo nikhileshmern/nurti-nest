@@ -12,8 +12,8 @@ export default function LearnPage() {
     },
     {
       icon: Shield,
-      title: 'Blue Light Protection',
-      description: 'With increased screen time, our gummies help protect young eyes from harmful blue light emitted by digital devices.',
+      title: 'Gluten Free',
+      description: 'Made without gluten, formulated for gentle digestion and suitable for a gluten‑free lifestyle.',
     },
     {
       icon: Heart,
@@ -183,7 +183,7 @@ export default function LearnPage() {
                 <ul className="space-y-3">
                   {[
                     'Vitamin A - Essential for night vision and eye development',
-                    'Lutein & Zeaxanthin - Natural blue light filters',
+                    'Gluten Free - Made without gluten',
                     'Vitamin C & E - Powerful antioxidants for eye protection',
                     'Omega-3 Fatty Acids - Support retinal health'
                   ].map((item, index) => (

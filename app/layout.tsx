@@ -21,8 +21,8 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: 'Nutri Nest - Healthy Eyes Start with a YumBurst!',
-  description: 'Tasty eye-care gummies for kids aged 4+. Supports visual clarity, filters blue light, and provides antioxidant support. 100% Vegan.',
-  keywords: 'eye care gummies, kids vitamins, visual clarity, blue light protection, vegan supplements',
+  description: 'Tasty eye-care gummies for kids aged 4+. Supports visual clarity, is gluten free, and provides antioxidant support. 100% Vegan.',
+  keywords: 'eye care gummies, kids vitamins, visual clarity, gluten free, vegan supplements',
   authors: [{ name: 'L&C Biotech' }],
   icons: {
     icon: '/favicon.ico',
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Nutri Nest - Healthy Eyes Start with a YumBurst!',
-    description: 'Tasty eye-care gummies for kids aged 4+. Supports visual clarity, filters blue light, and provides antioxidant support. 100% Vegan.',
+    description: 'Tasty eye-care gummies for kids aged 4+. Supports visual clarity, is gluten free, and provides antioxidant support. 100% Vegan.',
     url: 'https://nutri-nest.com',
     siteName: 'Nutri Nest',
     images: [
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Nutri Nest - Healthy Eyes Start with a YumBurst!',
-    description: 'Tasty eye-care gummies for kids aged 4+. Supports visual clarity, filters blue light, and provides antioxidant support. 100% Vegan.',
+    description: 'Tasty eye-care gummies for kids aged 4+. Supports visual clarity, is gluten free, and provides antioxidant support. 100% Vegan.',
     images: ['/images/logo/logo-1.png'],
   },
   robots: {

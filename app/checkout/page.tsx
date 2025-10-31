@@ -62,6 +62,8 @@ export default function CheckoutPage() {
     'WELCOME50': { discount: 50, type: 'fixed' as const, description: 'Welcome discount' },
     'SAVE10': { discount: 10, type: 'percentage' as const, description: '10% off' },
     'SAVE20': { discount: 20, type: 'percentage' as const, description: '20% off' },
+    // Hidden BOGO coupon, accepted when typed but not shown in lists
+    'NUTRINEST50': { discount: 0, type: 'bogo' as unknown as 'fixed', description: 'BOGO hidden' },
     // 'FREESHIP' removed - shipping is always free now!
   }
 
@@ -87,27 +89,54 @@ export default function CheckoutPage() {
     return
   }
 
-  // Apply coupon
-  const handleApplyCoupon = (code?: string) => {
+  // Apply coupon (supports hidden BOGO, one-time per email)
+  const handleApplyCoupon = async (code?: string) => {
     const upperCode = (code || couponCode).toUpperCase().trim()
-    
     if (!upperCode) {
       setCouponError('Please enter a coupon code')
       return
     }
 
-    const coupon = availableCoupons[upperCode as keyof typeof availableCoupons]
-    
-    if (coupon) {
-      setAppliedCoupon({ code: upperCode, ...coupon })
-      setCouponError('')
-      setCouponCode('')
-      setShowCoupons(false)
-      toast.success(`Coupon ${upperCode} applied!`)
-    } else {
+    const coupon = availableCoupons[upperCode as keyof typeof availableCoupons] as any
+    if (!coupon) {
       setCouponError('Invalid coupon code')
       setAppliedCoupon(null)
+      return
     }
+
+    // Special handling for BOGO
+    if (upperCode === 'NUTRINEST50') {
+      const totalUnits = items.reduce((sum, it) => sum + it.quantity, 0)
+      if (totalUnits < 2) {
+        setCouponError('Add one more item to use this Buy 1 Get 1 offer')
+        toast.error('Add one more item to use this offer')
+        return
+      }
+      if (!customerInfo.email) {
+        setCouponError('Enter your email before applying this offer')
+        return
+      }
+      try {
+        const res = await fetch('/api/coupons/validate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: customerInfo.email, code: 'NUTRINEST50' })
+        })
+        const data = await res.json()
+        if (!res.ok || !data.valid) {
+          setCouponError('This coupon has already been used with your email')
+          return
+        }
+      } catch (e) {
+        console.error('Coupon validation failed', e)
+      }
+    }
+
+    setAppliedCoupon({ code: upperCode, ...coupon })
+    setCouponError('')
+    setCouponCode('')
+    setShowCoupons(false)
+    toast.success(`Coupon ${upperCode} applied!`)
   }
 
   // Remove coupon
@@ -118,11 +147,20 @@ export default function CheckoutPage() {
     toast.success('Coupon removed')
   }
 
-  // Calculate discount
+  // Calculate discount (includes BOGO, max 2 free)
   const calculateDiscount = () => {
     if (!appliedCoupon) return 0
     
     const subtotal = getTotalPrice()
+    if ((appliedCoupon as any).type === 'bogo') {
+      const totalUnits = items.reduce((sum, it) => sum + it.quantity, 0)
+      if (totalUnits < 2) return 0
+      const freeUnits = Math.min(Math.floor(totalUnits / 2), 2)
+      const unitPrices: number[] = []
+      items.forEach(it => { for (let i = 0; i < it.quantity; i++) unitPrices.push(it.price) })
+      unitPrices.sort((a, b) => a - b)
+      return unitPrices.slice(0, freeUnits).reduce((s, p) => s + p, 0)
+    }
     if (appliedCoupon.type === 'percentage') {
       return Math.round((subtotal * appliedCoupon.discount) / 100)
     }
@@ -264,6 +302,7 @@ export default function CheckoutPage() {
           items, 
           customerInfo,
           discountAmount: calculateDiscount(),
+          couponCode: appliedCoupon?.code || null,
           userId: user?.id || null // Send user ID if logged in
         }),
       })
@@ -706,7 +745,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex items-center space-x-3">
                   <Truck className="w-5 h-5 text-green-500" />
-                  <span className="text-sm text-gray-600">Free Shipping Always! 🎉</span>
+                  <span className="text-sm text-gray-600">Free Shipping! 🎉</span>
                 </div>
               </div>
             </div>

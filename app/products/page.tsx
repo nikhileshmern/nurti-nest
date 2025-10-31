@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import ProductCard from '@/components/ProductCard'
 import { motion, AnimatePresence } from 'framer-motion'
+import Link from 'next/link'
 import { formatPrice } from '@/lib/utils'
 import { useCart } from '@/context/CartContext'
 import { Eye, Monitor, Leaf, Award, Star, ShoppingCart, Truck, Package, Heart, CreditCard } from 'lucide-react'
@@ -108,7 +109,9 @@ export default function ProductsPage() {
 
         // Transform database products to match component format
         if (productsData && productsData.length > 0) {
-          const transformedProducts = productsData.map((product: any) => {
+          const transformedProducts = productsData
+            .filter((p: any) => p.slug !== 'test-product-rs1')
+            .map((product: any) => {
             // Map database image URLs to local images
             let localImageUrl = product.image_url
             
@@ -134,7 +137,7 @@ export default function ProductsPage() {
               flavour: product.flavour,
               description: product.description,
               price: Math.round(product.price / 100), // Convert paise to rupees
-              originalPrice: Math.round((product.price / 100) * 1.29), // Calculate original price (22% off)
+              originalPrice: 899, // Standard MRP for individual pack
               image_url: localImageUrl,
               stock: product.stock,
               category: 'individual'
@@ -158,24 +161,30 @@ export default function ProductsPage() {
               localImageUrl = combo.image_url
             }
             
+            // Compute discount percentage (always calculate from fixed prices, ignore DB value)
+            const priceRupees = Math.round(combo.price / 100) // should be 1299
+            const originalRupees = 1798 // Standard MRP for two individual packs
+            const discountPct = Math.max(1, Math.round(((originalRupees - priceRupees) / originalRupees) * 100)) // Always calculate: (1798 - 1299) / 1798 * 100 = 28%
+
             return {
               id: combo.id,
               name: combo.name,
               slug: combo.name.toLowerCase().replace(/\s+/g, '-'),
               flavour: 'Mixed',
               description: combo.description,
-              price: Math.round(combo.price / 100), // Convert paise to rupees
-              originalPrice: Math.round((combo.price / 100) * 1.08), // Calculate original price
+              price: priceRupees, // Convert paise to rupees
+              originalPrice: originalRupees, // Calculated original price (approx)
+              discountPercentage: discountPct,
               image_url: localImageUrl,
               stock: 50,
               category: 'combo',
-              discount: combo.discount_percentage || 7,
+              discount: discountPct,
               includedProducts: [
                 { name: 'YumBurst Orange Gummies', flavour: 'Orange' },
                 { name: 'YumBurst Pomegranate Gummies', flavour: 'Pomegranate' }
               ],
               benefits: [
-                `Save ${combo.discount_percentage}% compared to buying separately`,
+                `Save ${discountPct}% compared to buying separately`,
                 'Perfect for trying both flavors',
                 'Free shipping on orders above ₹500',
                 '30-day satisfaction guarantee'
@@ -284,9 +293,24 @@ export default function ProductsPage() {
 
         {/* Loading State */}
         {loading && (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-1 mb-4"></div>
-            <p className="text-gray-600">Loading products from database...</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-10">
+            {[...Array(6)].map((_, i) => (
+              <div key={`skeleton-${i}`} className="bg-white rounded-2xl p-6 shadow-md">
+                <div className="w-full h-48 bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100 animate-[shimmer_1.5s_infinite] rounded-xl mb-4" style={{backgroundSize:'200% 100%'}}/>
+                <div className="h-4 w-3/4 bg-gray-200 rounded mb-2 animate-pulse"/>
+                <div className="h-4 w-1/2 bg-gray-200 rounded mb-2 animate-pulse"/>
+                <div className="flex items-center justify-between mt-4">
+                  <div className="h-6 w-24 bg-gray-200 rounded animate-pulse"/>
+                  <div className="h-10 w-28 bg-gray-200 rounded-lg animate-pulse"/>
+                </div>
+              </div>
+            ))}
+            <style jsx>{`
+              @keyframes shimmer {
+                0% { background-position: 200% 0; }
+                100% { background-position: -200% 0; }
+              }
+            `}</style>
           </div>
         )}
 
@@ -365,9 +389,9 @@ export default function ProductsPage() {
               >
                 <Monitor className="w-8 h-8 text-white" />
               </motion.div>
-              <h3 className="text-lg font-semibold font-poppins">Blue Light Protection</h3>
+              <h3 className="text-lg font-semibold font-poppins">Gluten Free</h3>
               <p className="text-gray-600 text-sm">
-                Helps filter harmful blue light from digital devices.
+                Formulated without gluten; suitable for gluten-sensitive individuals.
               </p>
             </motion.div>
             
@@ -434,43 +458,44 @@ function ComboCard({ combo }: { combo: any }) {
 
   return (
     <motion.div
-      whileHover={{ y: -8, scale: 1.02 }}
-      className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 p-6 group relative overflow-hidden flex flex-col h-full"
+      className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300 p-6 group relative overflow-hidden flex flex-col h-full"
     >
-      {/* Discount Badge */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="absolute top-4 right-4 z-10 bg-accent-2 text-white px-3 py-1 rounded-full text-sm font-bold"
-      >
-        {combo.discountPercentage}% OFF
-      </motion.div>
+      {/* Floating discount badge removed; now shown beside price */}
 
-      {/* Combo Badge */}
-      <div className="absolute top-4 left-4 z-10 bg-accent-1 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center space-x-1">
-        <Package className="w-4 h-4" />
-        <span>COMBO</span>
+      {/* Best Value Badge (replaces Combo) */}
+      <div className="absolute top-4 left-4 z-10 bg-accent-1 text-white px-3 py-1 rounded-full text-sm font-bold shadow flex items-center space-x-1">
+        <span>BEST VALUE</span>
       </div>
 
-      <div className="relative mb-4">
-        <motion.div 
-          whileHover={{ scale: 1.05 }}
-          className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl overflow-hidden"
-        >
+      {/* Wishlist */}
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="absolute top-4 right-4 z-10 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-md hover:bg-white transition-colors"
+        aria-label="Add to wishlist"
+      >
+        <Heart className="w-5 h-5 text-gray-400 hover:text-red-500 transition-colors" />
+      </motion.button>
+
+      <Link href={`/products/${combo.slug}`} className="block relative mb-4">
+        <div className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl overflow-hidden">
           <img
             src={combo.image_url}
             alt={combo.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
-        </motion.div>
-      </div>
+        </div>
+      </Link>
 
       <div className="space-y-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 font-poppins group-hover:text-accent-1 transition-colors">
-            {combo.name}
-          </h3>
+          <Link href={`/products/${combo.slug}`} className="block">
+            <h3 className="text-lg font-semibold text-gray-900 font-poppins hover:text-accent-1 transition-colors">
+              {combo.name}
+            </h3>
+          </Link>
           <p className="text-sm text-accent-1 font-medium">Special Combo Pack</p>
+          <p className="text-xs text-gray-500">30 Nos each flavour</p>
         </div>
 
         <p className="text-gray-600 text-sm line-clamp-2">
@@ -528,13 +553,18 @@ function ComboCard({ combo }: { combo: any }) {
         <div className="flex-grow"></div>
 
         {/* Pricing */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <div className="text-2xl font-bold text-accent-1">
             {formatPrice(combo.price)}
           </div>
           <div className="text-lg text-gray-400 line-through">
             {formatPrice(combo.originalPrice)}
           </div>
+          {combo.discountPercentage > 0 && (
+            <span className="text-xs font-bold text-white bg-gradient-to-br from-red-500 to-pink-600 px-2 py-1 rounded-full shadow">
+              {combo.discountPercentage}% OFF
+            </span>
+          )}
         </div>
 
         <div className="flex gap-2">

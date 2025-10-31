@@ -89,7 +89,7 @@ INSERT INTO products (name, slug, flavour, description, price, image_url, stock)
   'YumBurst Pomegranate Gummies',
   'yumburst-pomegranate-gummies',
   'Pomegranate',
-  'Tasty pomegranate-flavored gummies rich in antioxidants for optimal eye health. Contains lutein and zeaxanthin for blue light protection.',
+  'Tasty pomegranate-flavored gummies rich in antioxidants for optimal eye health. Gluten free.',
   69900,
   'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop',
   30
