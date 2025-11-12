@@ -170,8 +170,8 @@ export default function ContactPage() {
               <div className="space-y-6">
                 {[
                   { icon: Mail, title: 'Email', details: ['support@mynutrinest.in', 'info@mynutrinest.in'], color: 'bg-accent-1' },
-                  { icon: Phone, title: 'Phone', details: ['+91 98765 43210', '+91 98765 43211'], color: 'bg-accent-2' },
-                  { icon: MapPin, title: 'Address', details: ['L&C Biotech LLP', 'Hyderabad, Telangana', 'India'], color: 'bg-accent-1' },
+                  { icon: Phone, title: 'Phone', details: ['+91 7207182578'], color: 'bg-accent-2' },
+                  { icon: MapPin, title: 'Address', details: ['L&C Biotech LLP', 'Hyderabad, Telangana', '500034'], color: 'bg-accent-1' },
                 
                 ].map((contact, index) => (
                   <motion.div 

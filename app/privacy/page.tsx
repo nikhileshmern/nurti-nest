@@ -303,7 +303,7 @@ export default function PrivacyPage() {
                 </p>
                 <div className="space-y-2 text-text">
                   <p><strong>Email:</strong> support@mynutrinest.in</p>
-                  <p><strong>Phone:</strong> +91 98765 43210</p>
+                  <p><strong>Phone:</strong> +91 7207182578</p>
                   <p><strong>Address:</strong> 8-2-269/19/382/A, INDIRA NAGAR, BANJARA HILLS Hyderabad TELANGANA 500034</p>
                 </div>
               </motion.section>
