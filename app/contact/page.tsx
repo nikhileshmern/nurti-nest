@@ -169,10 +169,10 @@ export default function ContactPage() {
               
               <div className="space-y-6">
                 {[
-                  { icon: Mail, title: 'Email', details: ['support@nutri-nest.com', 'info@nutri-nest.com'], color: 'bg-accent-1' },
+                  { icon: Mail, title: 'Email', details: ['support@mynutrinest.in', 'info@mynutrinest.in'], color: 'bg-accent-1' },
                   { icon: Phone, title: 'Phone', details: ['+91 98765 43210', '+91 98765 43211'], color: 'bg-accent-2' },
-                  { icon: MapPin, title: 'Address', details: ['L&C Biotech Pvt. Ltd.', 'Mumbai, Maharashtra 400001', 'India'], color: 'bg-accent-1' },
-                  { icon: Clock, title: 'Business Hours', details: ['Monday - Friday: 9:00 AM - 6:00 PM', 'Saturday: 10:00 AM - 4:00 PM', 'Sunday: Closed'], color: 'bg-accent-2' }
+                  { icon: MapPin, title: 'Address', details: ['L&C Biotech LLP', 'Hyderabad, Telangana', 'India'], color: 'bg-accent-1' },
+                
                 ].map((contact, index) => (
                   <motion.div 
                     key={contact.title}

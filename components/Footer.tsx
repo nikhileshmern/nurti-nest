@@ -210,9 +210,9 @@ export default function Footer() {
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-text">
             {[
-              { icon: Mail, text: 'support@nutrinest.in' },
+              { icon: Mail, text: 'support@mynutrinest.in' },
               { icon: Phone, text: '+91 98765 43210' },
-              { icon: MapPin, text: 'hyderabad, India' }
+              { icon: MapPin, text: 'hyderabad' }
             ].map((contact, index) => (
               <motion.div
                 key={index}
